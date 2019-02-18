@@ -1,5 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-Starters
+<h1>Starters</h1>
+<ul class="list-group">
+{% for starter in starters %}
+    <li class="list-group-item"><a href="starter/{{starter.id}}">{{starter.item_name}}</a>              £{{starter.price}}<br>{{starter.item_description}} <p>{{starter.suitable_for_vegetarians}}</p></li>
+{% endfor %}
+</ul>
 {% endblock %}

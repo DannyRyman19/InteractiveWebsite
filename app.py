@@ -93,7 +93,7 @@ def orderdrinks(product_id):
         cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
-                cur1.execute("SELECT * FROM product, tables, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
+                cur1.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
                 sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
                 #print(subcat["subcategory_id"])
 

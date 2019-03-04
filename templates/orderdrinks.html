@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1>Drinks</h1>
+<hr>
+
+{% for category in sub_categories %}
+<style>
+        #Form{{category[2]}}{
+            display: none;
+        }
+        </style>
+<h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
+<form id = "Form{{category[2]}}">
+      
+
+
+<script>
+        $("#btn{{category[2]}}").click(function(){
+        $("#Form{{category[2]}}").toggle();
+      
+    });
+</script>
+<table class="table table-striped">
+        <tr><th>Name/Price</th>
+        <th>Quantity</th>
+        <th></th>
+        <th></th>
+        <th></th>
+
+    </tr>
+
+    {% for drink in category[1] %}
+            <tr>
+                    <td>{{drink.name}}  - £{{drink.price}}</td>  
+                    <td><input type="button" id ='SubButton{{drink.product_id}}' value = "-">
+                    <script>
+                    $('#SubButton{{drink.product_id}}').on('click', function () {
+                    var input = $('#quantity{{drink.product_id}}');
+                    if (parseInt(input.val != 0)){
+                        input.val(parseFloat(input.val()) - 1);
+                        }
+                    })               
+                    </script>
+                    <input type="number" min= "0" name="quantity{{drink.product_id}}" style="width: 40px;" id="quantity{{drink.product_id}}" value="0">
+                    <input type="button" id ='AddButton{{drink.product_id}}' value = "+">
+                    <script>
+                    $('#AddButton{{drink.product_id}}').on('click', function () {
+                    var input = $('#quantity{{drink.product_id}}');
+                    input.val(parseFloat(input.val()) + 1);
+                        })
+                    </script>
+                    </td>
+                    <td><button class = "btn btn-primary float-right" style="align-content: center;"><a href="#" style="color: white;">Add Message</a></button></td>
+                    <td><button class = "btn btn-secondary float-right" style="align-content: center;"><a href="#" style="color: white;">Options</a></button></td>
+                    <td><button class = "btn btn-success float-right" style="align-content: center;"><a href="#" style="color: white;">Add to Order</a></button></td>
+                </tr>
+            
+    {% endfor %}  
+</table>
+
+    
+</form>
+<hr>
+{% endfor %}
+
+
+
+
+
+
+{% endblock %}

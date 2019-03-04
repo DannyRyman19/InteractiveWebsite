@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+    <h1>User Management</h1>
+    <h3><small>Welcome {{session.name}}</small></h3>
+    <hr>
+    <a class="btn-lg btn-success" href="/add_user">Add User</a>
+    <hr>
+    <table class="table table-striped">
+        
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Authority</th>
+            <th></th>
+            <th></th>
+
+        </tr>
+        {% for user in users %}
+       <tr id="user{{user.id}}">
+         <script>
+            $("#user{{user.id}}").click(function(){
+              window.location = "edit_user/{{user.id}}";
+            })
+         </script>
+            <td>{{user.id}}</td>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            <th>{{user.username}}</th>
+            <td>  {% if user.authority == 1 %}
+                    <p>General Manager</p>
+                  {% elif user.authority ==2 %}
+                    <p>Assistant Manager</p>
+                  {% elif user.authority ==3 %}
+                    <p>Supervisor</p>
+
+                  {% else %}
+                    <p>Waiter</p>
+
+                  {% endif %}</td>
+            <td><a href="edit_user/{{user.id}}" class="btn btn-primary pull-right">Edit</a></td>
+            <td>
+              {% if user.id == session.id %}
+              <script>
+               document.getElementById("deleteButton").disabled = true;
+              </script>
+              {% else %}
+              <script>
+                document.getElementById("deleteButton").disabled = false;
+              </script>
+                <form action="{{url_for('delete_user',id=user.id)}}" method="POST">
+                <button type="button" id = "deleteButton" onclick="document.getElementById('deleteForm').action = '/delete_user/{{user.id}}';" class="btn btn-info btn-danger " data-toggle="modal" data-target="#myModal">Delete</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr> </a>
+        {% endfor %}
+    </table>
+    
+ <!-- Modal -->
+ <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+        
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you want to delete.</p>
+            </div>
+            <div class="modal-footer">
+                    <form id="deleteForm" action="" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="submit" value="Delete" class="btn btn-danger">
+                            <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
+        
+                    </form>
+                    
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+{% endblock %}

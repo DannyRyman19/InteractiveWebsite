@@ -26,6 +26,15 @@ def is_logged_in(f):
                         return redirect(url_for('login'))
         return wrap
 
+def is_manager(f):
+        @wraps(f)
+        def wrap(*args, **kwargs):
+                if 'manager' in session:
+                        return f(*args, **kwargs)
+                else:
+                        flash("You must be a manager to access this page", 'danger')
+                        return redirect(url_for('floor'))
+        return wrap
 
 mysql= MySQL(app)
 
@@ -227,6 +236,11 @@ def desserts():
        
         return render_template('desserts.html', desserts=desserts)
 
+class EditForm(Form):
+        name = StringField('Name', [validators.Length(min=1)])
+        username = StringField('Username', [validators.Length(min=4,max=25)])
+        email = StringField('Email', [validators.Length(min =6, max = 50)])
+        authority = SelectField('Authority', choices=[('1','General Manager'),('2','Assistant Manager'),('3','Supervisor'),('4','Waiter')])
 
 
 
@@ -341,7 +355,101 @@ def stock_management():
         cur.close()
         return render_template('stock_management.html',drinks=drinks, starters=starters, mains = mains, sides=sides,desserts=desserts)
 
+#user management
+@app.route('/user_management')
+@is_logged_in
+@is_manager
+def user_management():
+       
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT id, name, email, username, authority FROM users ")  
+        users = cur.fetchall()
+        cur.close()
+        return render_template('user_management.html',users = users)
 
+#User delete
+@app.route('/delete_user/<int:id>', methods = ["POST"])
+@is_logged_in
+@is_manager
+def delete_user(id):
+        cur = mysql.connection.cursor()
+        cur.execute("DELETE FROM users WHERE id = %s", [id])
+        mysql.connection.commit()
+        cur.close()
+        flash('User Deleted!', 'success')
+
+        return redirect(url_for('user_management'))
+
+#Add user
+@app.route('/add_user', methods = ["GET", "POST"])
+@is_logged_in
+@is_manager
+def add_user():
+        form = RegisterForm(request.form)
+      
+        if request.method == 'POST' and form.validate():
+                name = form.name.data
+                email = form.email.data
+                username = form.username.data
+                authority = form.authority.data
+                password = sha256_crypt.encrypt(str(form.password.data)) #encrypts password
+                cur = mysql.connection.cursor()
+                result = cur.execute("SELECT * FROM users WHERE email = %s", [email] )
+                result2 = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+                if result > 0:
+                        flash("Email already in use. Please try another one!","danger")
+                        cur.close()
+                elif result2 > 0:
+                        flash("Username already in use. Please try another one!","danger")
+                        cur.close()
+                else:
+                        cur = mysql.connection.cursor()
+                        cur.execute("INSERT INTO users(name, email, username, authority, password) VALUES(%s, %s, %s,%s, %s)",(name, email, username, authority, password)) #adds all registration information into database
+
+                        mysql.connection.commit()
+
+                        cur.close()
+                
+                        flash("User Added!", "success")
+                        return redirect(url_for('user_management'))
+        return render_template('add_user.html', form = form)
+
+#Edit User
+@app.route('/edit_user/<int:id>', methods = ["GET", "POST"])
+@is_logged_in
+@is_manager
+def edit_user(id):
+
+        cur = mysql.connection.cursor()
+        
+        result = cur.execute("SELECT * FROM users WHERE id = %s", [id])
+
+        user = cur.fetchone()
+
+        form = EditForm(request.form)
+
+        form.name.data= user['name']
+        form.username.data= user['username']
+        form.email.data= user['email']
+        form.authority.process_data(user['authority'])
+        
+
+        if request.method == "POST":
+                name = request.form['name']
+                username = request.form['username']
+                email = request.form['email']
+                authority = request.form['authority']
+             
+                cur = mysql.connection.cursor()
+                cur.execute("UPDATE users SET name=%s, username=%s, email=%s, authority=%s WHERE  id = %s", (name, username, email,  authority, id))
+                mysql.connection.commit()
+
+                cur.close()
+
+                flash('User updated!', 'success')    
+
+                return redirect(url_for('user_management'))
+        return render_template('_edit_user.html', form = form, user = user)
 
 
 @app.route('/dashboard')

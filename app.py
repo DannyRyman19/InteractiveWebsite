@@ -27,6 +27,8 @@ def is_logged_in(f):
         return wrap
 
 
+mysql= MySQL(app)
+
      
 @app.route('/')
 def index():
@@ -36,7 +38,109 @@ def index():
  
 
 
+class productForm(Form):
+        name = TextAreaField('Name', [validators.Length(min=1, max=200)])
+        description = TextAreaField('Description', [validators.Length(min=0,max=200)])
+        price = DecimalField('price')
+        category_id = SelectField('Category', choices = [('1','Drinks'),('2','Starters'),('3','Mains'),('4','Sides'),('5', 'Desserts'),('6','Others')])
+        stock = IntegerField('Stock Count')
+        subcategory_id = SelectField('Sub Category', choices=[('1','Soft'),('2','Hot'),('3','White Wine'),('4','Red Wine'),('5','Sparkling/Fizzy'),('6','Beer'),('7','Cocktail'),('8','Drink Other'), ('9','Pizza'), ('10','Pasta'),('11','Grill'), ('12','Salad'),('13','Risotto'),('14','Starter Other'),('15','Main Other'),('16','Side Other'), ('17','Dessert Other')])  
 
+
+#Product addition  to databse      
+@app.route('/add_product', methods = ["GET", "POST"])
+@is_logged_in
+@is_manager                             
+def add_product():
+      
+        form = productForm(request.form)
+     
+        if request.args.get('type'):
+                form.category_id.process_data(request.args.get('type'))
+        if request.method == "POST" and form.validate():
+                     
+                name = form.name.data
+                description = form.description.data
+                price = form.price.data
+                category_id = form.category_id.data
+                subcategory_id= form.subcategory_id.data
+                stock = form.stock.data
+                cur = mysql.connection.cursor()
+                cur.execute("INSERT INTO product (name, description, subcategory_id) VALUES (%s, %s, %s)",(name,description,subcategory_id))
+                mysql.connection.commit()
+       
+                cur.execute("INSERT INTO product_variation (product_id, price, stock) VALUES (LAST_INSERT_ID(),%s, %s)",(price,stock))
+                mysql.connection.commit()
+               
+                cur.close()
+
+                flash('Product Created!', 'success')
+
+                return redirect(url_for('stock_management'))
+        return render_template('add_product.html', form = form)
+
+
+        
+#Edit Product
+@app.route('/edit_product/<int:product_id>', methods = ["GET", "POST"])
+@is_logged_in
+@is_manager
+def edit_product(product_id):
+
+        cur = mysql.connection.cursor()
+        form = productForm(request.form)
+           
+        cur.execute("SELECT * FROM product, product_variation, sub_category, category WHERE product.product_id = product_variation.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = category.category_id and product.product_id = %s;", [product_id])
+        product = cur.fetchone()
+        form.name.data= product['name']
+        form.description.data= product['description']
+        form.price.data= product['price']
+        form.subcategory_id.process_data(product['subcategory_id'])
+        form.category_id.process_data(product['category_id'])
+        form.stock.data = product['stock']
+     
+
+        if request.method == "POST" and form.validate():
+                name = request.form['name']
+                description = request.form['description']
+                price = request.form['price']
+                category_id = request.form['category_id']
+                subcategory_id = request.form['subcategory_id']
+                stock = request.form['stock']
+                cur = mysql.connection.cursor()
+                cur.execute("UPDATE product SET name=%s, description=%s, subcategory_id=%s WHERE product.product_id = %s", (name, description, subcategory_id, product_id))
+                
+                mysql.connection.commit()
+
+                cur.execute("UPDATE product_variation SET price=%s, stock=%s WHERE product_id = %s", (price,  stock, product_id))
+                mysql.connection.commit()
+
+                cur.close()
+
+                flash('Product updated!', 'success')
+
+                return redirect(url_for('stock_management'))
+        return render_template('_edit_product.html', form = form)
+
+
+#Product delete
+@app.route('/delete_product/<int:id>', methods = ["POST"])
+@is_logged_in
+@is_manager
+def delete_product(id):
+        cur = mysql.connection.cursor()
+
+        cur.execute("DELETE FROM product  WHERE product_id = %s", [id])
+
+        mysql.connection.commit()
+
+        cur.execute("DELETE FROM product_variation WHERE product_id = %s", [id])
+        mysql.connection.commit()
+        cur.close()
+        
+        flash('Product Deleted!', 'success')
+
+        return redirect(url_for('stock_management'))
 #drinks
 @app.route('/drinks')
 def drinks():
@@ -125,6 +229,9 @@ def desserts():
 
 
 
+
+
+
 #sign up form validation
 class RegisterForm(Form):
         name = StringField('Name', [validators.Length(min=1)])
@@ -204,6 +311,36 @@ def logout():
         session.clear() 
         flash("You have been logged out!", 'success')
         return redirect(url_for('login'))
+
+#stock management
+@app.route('/stock_management')
+@is_logged_in
+@is_manager
+def stock_management():
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 1 and category.category_id = 1;")
+
+        drinks = cur.fetchall()
+
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
+
+        starters= cur.fetchall()
+        
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 3 and category.category_id = 3;")
+
+        mains= cur.fetchall()
+
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 4 and category.category_id = 4;")
+
+        sides= cur.fetchall()
+
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 5 and category.category_id = 5;")
+
+        desserts = cur.fetchall()
+
+        cur.close()
+        return render_template('stock_management.html',drinks=drinks, starters=starters, mains = mains, sides=sides,desserts=desserts)
+
 
 
 

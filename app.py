@@ -41,7 +41,24 @@ mysql= MySQL(app)
 def floor():
         return render_template('restaurant_floor.html')
 
+@app.route('/tables/<string:id>')
+@is_logged_in
+def tables(id):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM tables where table_id = %s;",(id))
+        tables = cur.fetchone()
+        cur.execute("SELECT * FROM order_item, product, product_variation, category, sub_category where product.product_id = product_variation.product_id and product.subcategory_id = sub_category.subcategory_id and order_item.table_id = %s and category.category_id = sub_category.category_id and category.category_id = 1;",(id))
+        drinks = cur.fetchone()
+        
 
+        
+        #itemtotal = int(itemsubtotal.quantity * itemsubtotal.price) 
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks)
+
+
+
+class TableForm(Form):
+        covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3')])
      
 @app.route('/')
 def index():

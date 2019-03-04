@@ -37,6 +37,10 @@ def is_manager(f):
         return wrap
 
 mysql= MySQL(app)
+@app.route('/restaurant_floor')
+def floor():
+        return render_template('restaurant_floor.html')
+
 
      
 @app.route('/')

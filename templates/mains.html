@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1>Mains</h1>
+<hr>
+{% for category in sub_categories %}
+<h3>{{category[0]}}</h3>
+<table class="table table-striped">
+        <tr><th>Name</th>
+        <th>Price</th>
+        <th>Description</th></tr>
+
+    {% for main in category[1] %}
+            <tr>
+                <td>
+                    {{main.name}}
+                </td>
+                <td>
+                    £{{main.price}}
+                </td>
+                <td>
+                    {{main.description}}
+                </td>
+            </tr>
+    {% endfor %}  
+    </table>
+    {% endfor %}
+<hr>
+
+
+{% endblock %}

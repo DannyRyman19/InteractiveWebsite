@@ -8,7 +8,10 @@
       <ul class="navbar-nav mr-auto">
         <li class="nav-item ">
           <a class="nav-link" href="/">Home <span class="sr-only"></span></a>
-        </li>      
+        </li>    
+        <li class="nav-item">
+            <a class="nav-link" href="/drinks">Drinks<span class="sr-only"></span></a>
+       </li>  
         <li class="nav-item">
                 <a class="nav-link" href="/starters">Starters<span class="sr-only"></span></a>
         </li>
@@ -16,24 +19,44 @@
                 <a class="nav-link" href="/mains">Mains<span class="sr-only"></span></a>
         </li>  
         <li class="nav-item">
-                <a class="nav-link" href="/">Desserts<span class="sr-only"></span></a>
+            <a class="nav-link" href="/sides">Sides<span class="sr-only"></span></a>
+        </li>  
+        <li class="nav-item">
+                <a class="nav-link" href="/desserts">Desserts<span class="sr-only"></span></a>
         </li>  
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if session.logged_in %}
-        <li class="nav-item">
-            <a class="nav-link" href="/dashboard">Dashboard<span class="sr-only"></span></a>
-        </li>  
-        <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout<span class="sr-only"></span></a>
-        </li>  
+            {% if session.manager %}
+             <li class="nav-item">
+              <a class="nav-link" href="/dashboard">Dashboard <span class="sr-only"></span></a>
+             </li>           
+             <li class="nav-item">
+              <a class="nav-link" href="/stock_management">Stock Management<span class="sr-only"></span></a>
+             </li> 
+             <li class="nav-item">
+              <a class="nav-link" href="/restaurant_floor">Floor<span class="sr-only"></span></a>
+             </li>  
+             <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout<span class="sr-only"></span></a>
+             </li>  
+          {% else %}          
+          <li class="nav-item">
+             <a class="nav-link" href="/restaurant_floor">Floor<span class="sr-only"></span></a>
+          </li>  
+         <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout<span class="sr-only"></span></a>
+         </li>  
+      
+        
+      
+      
+        {% endif %} 
         {% else %} 
-        <li class="nav-item">
-          <a class="nav-link nav-right" href="/register">Register<span class="sr-only"></span></a>
-        </li>  
         <li class="nav-item">
           <a class="nav-link" href="/login">Login<span class="sr-only"></span></a>
         </li>  
+       
        {% endif %}
       </ul>
     </div>

@@ -1,5 +1,31 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Dashboard<small> Welcome {{session.username}}</small></h1>
+    <h1>Dashboard</h1>
+    <h3><small>Welcome {{session.name}}</small><small class="float-right">Account: {{session.auth}}</small></h3>
+   
+    <hr>
+    <div class="container">
+            <div class="row">
+              <div class="col-sm">
+                <a class="btn btn-block btn-success" href="/stock_management">Stock Management</a>
+              </div>
+              <div class="col-sm">
+                <a class="btn btn-block btn-success" href="/user_management">User Management</a>
+              </div>
+              <div class="col-sm">
+                <a class="btn btn-block btn-success" href="/add_product">Bill History</a>
+              </div>
+              <div class="col-sm">
+                    <a class="btn btn-block btn-success" href="/add_product">Bill History</a>
+                  </div>
+            </div>
+          </div>
+    
+   
+    
+    
+    <hr>
+   
+
 {% endblock %}

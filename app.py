@@ -55,7 +55,71 @@ def tables(id):
         #itemtotal = int(itemsubtotal.quantity * itemsubtotal.price) 
         return render_template('tables.html', id = id, tables = tables, drinks=drinks)
 
+#open table
+@app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
+@is_logged_in
+def opentable(id):
 
+      
+        form = TableForm(request.form)
+        print(form.covers)
+        if request.method == "POST":
+                     
+                covers = form.covers.data
+                cur = mysql.connection.cursor()
+                cur.execute("UPDATE tables SET active = %s, covers = %s WHERE table_id = %s;",("1", covers, id))
+                mysql.connection.commit()
+                cur.close()
+                mess = ('Table ' + (id)  +' Opened!')
+                flash(mess,'success')
+
+                return redirect(url_for('floor'))
+        return render_template('open_table.html', form = form)
+
+#add drinks
+@app.route('/tables/<string:product_id>/orderdrinks')
+@is_logged_in
+def orderdrinks(product_id):
+        
+       
+        cur = mysql.connection.cursor()
+
+        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
+        
+       
+        sub_categories = cur.fetchall()
+        cur1 = mysql.connection.cursor()
+        sub=[]
+        for subcat in sub_categories:
+                cur1.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id", (str((subcat["subcategory_id"]))))
+                sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
+                #print(subcat["subcategory_id"])
+
+
+        cur.close()
+     
+     
+
+       #SELECT *FROM product, product_variation, category, sub_category WHERE product.subcategory_id = 6 AND product.product_id = product_variation.product_id AND category.category_id = sub_category.category_id AND category.category_id = 1 AND sub_category.subcategory_id = 6;
+
+        return render_template('orderdrinks.html', sub_categories = sub)
+
+
+
+#Close table
+@app.route('/tables/closetable/<string:id>/', methods = ["GET", "POST"])
+@is_logged_in
+def close_table(id):
+        cur = mysql.connection.cursor()
+
+        cur.execute("UPDATE tables SET active = %s, covers = %s, total_cost = %s, order_id = NULL WHERE table_id = %s;",(0,0,0.00,id))
+
+        mysql.connection.commit()
+        cur.close()
+        
+        flash('Table Closed!', 'danger')
+
+        return redirect(url_for('floor'))
 
 class TableForm(Form):
         covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3')])

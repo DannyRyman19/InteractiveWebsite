@@ -4,6 +4,7 @@
 
     {% if tables.active ==  1 %}
         <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
+        <h4>Order ID: {{order_id}}</h4>
         <hr>
         <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
             <a class="btn btn-success" href="/tables/{{id}}/starters">Starters</a>
@@ -36,7 +37,7 @@
             <td>{{drinks.quantity}}</td>
             <td>{{drinks.name}}</td>
             <td>{{drinks.price}}</td>
-            <td>{{drinks.quantity * drinks.price}}</td>
+            <td>{{drinks.price}}</td>
         </tr>
     </table>
 

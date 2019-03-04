@@ -32,22 +32,22 @@
 
     {% for drink in category[1] %}
             <tr>
-                    <td>{{drink.name}}  - £{{drink.price}}</td>  
+                    <td>{{drink.name}}  -  £{{drink.price}}</td>  
                     <td><input type="button" id ='SubButton{{drink.product_id}}' value = "-">
                     <script>
                     $('#SubButton{{drink.product_id}}').on('click', function () {
-                    var input = $('#quantity{{drink.product_id}}');
+                    var input = $(parseInt('#quantity{{drink.product_id}}'));
                     if (parseInt(input.val != 0)){
-                        input.val(parseFloat(input.val()) - 1);
+                        input.val(parseInt(input.val()) - 1);
                         }
                     })               
                     </script>
-                    <input type="number" min= "0" name="quantity{{drink.product_id}}" style="width: 40px;" id="quantity{{drink.product_id}}" value="0">
+                    <input type="number" min= "0" name="quantity{{drink.product_id}}" style="width: 30px;" id="quantity{{drink.product_id}}" value="0">
                     <input type="button" id ='AddButton{{drink.product_id}}' value = "+">
                     <script>
                     $('#AddButton{{drink.product_id}}').on('click', function () {
                     var input = $('#quantity{{drink.product_id}}');
-                    input.val(parseFloat(input.val()) + 1);
+                    input.val(parseInt(input.val()) + 1);
                         })
                     </script>
                     </td>

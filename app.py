@@ -47,13 +47,15 @@ def tables(id):
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM tables where table_id = %s;",(id))
         tables = cur.fetchone()
-        cur.execute("SELECT * FROM order_item, product, product_variation, category, sub_category where product.product_id = product_variation.product_id and product.subcategory_id = sub_category.subcategory_id and order_item.table_id = %s and category.category_id = sub_category.category_id and category.category_id = 1;",(id))
-        drinks = cur.fetchone()
-        
-
-        
+        cur.execute("SELECT order_id FROM tables where table_id = %s;",(id))
+        order_id = cur.fetchone()
+        cur.execute("SELECT * FROM order_item, product, tables, product_variation, category, sub_category where product.product_id = product_variation.product_id and product.subcategory_id = sub_category.subcategory_id and category.category_id = sub_category.category_id and category.category_id = 1 AND tables.table_id = %s AND tables.order_id = order_item.order_id and tables.order_id = %s;",(id, order_id ))
+        drinks = cur.fetchall()
+        cur.execute("UPDATE order_item, tables SET order_item.order_id = %s WHERE order_item.table_id = tables.table_id AND tables.table_ID = %s",(order_id, id))
+        cur.close()
+        order_id = str(order_id)
         #itemtotal = int(itemsubtotal.quantity * itemsubtotal.price) 
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks)
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks, order_id = order_id[14:-2])
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -67,7 +69,7 @@ def opentable(id):
                      
                 covers = form.covers.data
                 cur = mysql.connection.cursor()
-                cur.execute("UPDATE tables SET active = %s, covers = %s WHERE table_id = %s;",("1", covers, id))
+                cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s WHERE table_id = %s;",("1", covers, id))
                 mysql.connection.commit()
                 cur.close()
                 mess = ('Table ' + (id)  +' Opened!')
@@ -91,7 +93,7 @@ def orderdrinks(product_id):
         cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
-                cur1.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id", (str((subcat["subcategory_id"]))))
+                cur1.execute("SELECT * FROM product, tables, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
                 sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
                 #print(subcat["subcategory_id"])
 
@@ -111,9 +113,7 @@ def orderdrinks(product_id):
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
-
         cur.execute("UPDATE tables SET active = %s, covers = %s, total_cost = %s, order_id = NULL WHERE table_id = %s;",(0,0,0.00,id))
-
         mysql.connection.commit()
         cur.close()
         
@@ -314,7 +314,7 @@ def mains():
 @app.route('/desserts')
 def desserts():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 5 and category.category_id = 5;")
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id =  and category.category_id = 5;")
 
         desserts = cur.fetchall()
         cur.close()

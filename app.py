@@ -48,9 +48,9 @@ def floor():
 def tables(id):
         cur = mysql.connection.cursor()
         cur1 = mysql.connection.cursor()
-        cur.execute("SELECT * FROM tables where table_id = %s;",(id))
+        cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
-        cur.execute("SELECT order_id FROM tables where table_id = %s;",(id))
+        cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(id))
         order_id = cur.fetchone()
         print(order_id)
         order_id = str(order_id)
@@ -118,9 +118,7 @@ def orderdrinks(table_id):
         for subcat in sub_categories:
                 cur1.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
                 sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
-                #print(subcat["subcategory_id"])
-
-
+          
         cur.close()
 
         return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
@@ -144,9 +142,6 @@ def ordermains(table_id):
         for subcat in sub_categories:
                 cur1.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id ").format((subcat["subcategory_id"])))
                 sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
-                #print(subcat["subcategory_id"])
-
-
         cur.close()
 
         return render_template('ordermains.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)

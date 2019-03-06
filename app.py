@@ -53,10 +53,12 @@ def tables(id):
         print(order_id)
         order_id = str(order_id)
         order_id = order_id[14:-2]
-       
-        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} GROUP BY product.name;").format(order_id, id))
+        
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 1 GROUP BY product.name;").format(order_id, id))
         drinks = cur1.fetchall()
-        print(drinks)
+       
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name;").format(order_id, id))
+        mains = cur1.fetchall()
 
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
@@ -65,7 +67,7 @@ def tables(id):
         print(total)
         cur.close()
         
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks, total = total, order_id = order_id)
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks, mains = mains, total = total, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -113,13 +115,34 @@ def orderdrinks(table_id):
 
 
         cur.close()
-     
-     
-
-       #SELECT *FROM product, product_variation, category, sub_category WHERE product.subcategory_id = 6 AND product.product_id = product_variation.product_id AND category.category_id = sub_category.category_id AND category.category_id = 1 AND sub_category.subcategory_id = 6;
 
         return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
 
+
+#add mains
+@app.route('/tables/<string:table_id>/ordermains')
+@is_logged_in
+def ordermains(table_id):
+        
+       
+        cur = mysql.connection.cursor()
+
+        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 3")
+        sub_categories = cur.fetchall()
+        cur.execute("SELECT order_id FROM tables where table_id = %s;",(table_id))
+        order_id = cur.fetchone()
+        order_id = str(order_id)
+        cur1 = mysql.connection.cursor()
+        sub=[]
+        for subcat in sub_categories:
+                cur1.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id ").format((subcat["subcategory_id"])))
+                sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
+                #print(subcat["subcategory_id"])
+
+
+        cur.close()
+
+        return render_template('ordermains.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
 
 #add to order
 @app.route('/tables/<string:id>/add_to_table/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
@@ -141,6 +164,7 @@ def add_to_order(id, order_id, product_id, price):
               cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})) WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
         else:
              cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id)  VALUES('{0}',{1},{2},{3},{4})").format(order_id, id, quantity, quantity * price, product_id))
+        cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
 
 
         mysql.connection.commit()

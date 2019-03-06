@@ -8,7 +8,7 @@
         <hr>
         <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
             <a class="btn btn-success" href="/tables/{{id}}/starters">Starters</a>
-            <a class="btn btn-success" href="/tables/{{id}}/mains">Mains</a>
+            <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
             <div class="float-right"><h2>Total Bill £{{total}}</h2></div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a>
@@ -73,11 +73,14 @@
             <th>Sub Total</th>
         </tr>
         <tr>
-            <td></td> 
-            <td></td>
-            <td></td>
-            <td></td>
+            {% for main in mains %}
+            <td>{{main.quantity}}</td>
+            <td>{{main.name}}</td>
+            <td>{{main.price}}</td>
+            <td>{{main.subtotal}}</td>
         </tr>
+        
+        {% endfor %}
     </table>
 
     <hr>

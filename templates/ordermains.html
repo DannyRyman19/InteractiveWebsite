@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1>Drinks</h1>
+<h4>Order ID: {{order_id}}</h4>
+<hr>
+
+{% for category in sub_categories %}
+<style>
+        #Form{{category[2]}}{
+            display: none;
+        }
+        </style>
+<h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
+{% for main in category[1] %}
+<form id = "Form{{category[2]}}" action = "http://localhost:5000/tables/{{table_id}}/add_to_table/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
+      
+
+
+<script>
+        $("#btn{{category[2]}}").click(function(){
+        $("#Form{{category[2]}}").toggle();
+      
+    });
+</script>
+
+<table class="table table-striped">
+        <tr><th>Name</th>
+        <th>Price</th>
+        <th>Product ID</th>
+        <th>Quantity</th>
+        <th></th>
+        <th></th>
+
+    </tr>
+
+  
+            <tr>
+                
+                    <td><input type = "text" name = "Name" value="{{main.name}}" disabled="true"/></td>
+                    <td><input type = "text" name = "Price" value="£{{main.price}}" disabled="true"/></td>
+                    <td><input type = "number" style="width: 45px;" name = "product_id" value="{{main.product_id}}" disabled="true"/></td>
+                    <td><input type="button" id ='SubButton{{main.product_id}}' value = "-">
+                    <input type="number" min= "0" name="quantity{{main.product_id}}" style="width: 30px;" id="quantity{{main.product_id}}">
+                    <input type="button" id ='AddButton{{main.product_id}}' value = "+">
+                    <script>
+                    $('#SubButton{{main.product_id}}').on('click', function () {
+                    var input = $(parseInt('#quantity{{main.product_id}}'));
+                    if (parseInt(input.val != 0)){
+                        input.val(parseInt(input.val()) - 1);
+                        }
+                    })               
+                    </script>
+                    <script>
+                        $('#AddButton{{main.product_id}}').on('click', function () {
+                        var input = $('#quantity{{main.product_id}}');
+                        input.val(parseInt(input.val()) + 1);
+                     })
+                    </script>
+                    </td>
+                 
+                    <td><input type = "Submit" value = "Add to Order"></input></td>
+                  
+                   
+                   
+                
+
+                </tr>
+            
+    {% endfor %}  
+</table>
+
+    
+</form>
+<hr>
+{% endfor %}
+
+
+
+
+
+
+{% endblock %}

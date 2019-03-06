@@ -471,7 +471,10 @@ def login():
                                 session['name'] = name
                                 session['id'] = userID
                                 flash('You are now logged in', 'success')
-                                return redirect(url_for('dashboard')) #logs user in to dashboard
+                                if auth != "Waiter":
+                                        return redirect(url_for('dashboard'))
+                                else:
+                                        return redirect(url_for('floor')) #logs user in to dashboard
                         else: #passswords don't match
                                 error = "Login Failed"
                                 return render_template('login.html', error = error)

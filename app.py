@@ -186,7 +186,7 @@ def add_to_order(id, order_id, product_id, price):
 
 
         mysql.connection.commit()
-        return redirect(url_for('floor'))
+        return tables(id)
 
 
 

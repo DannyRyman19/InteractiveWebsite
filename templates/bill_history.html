@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+    <h1>Bill History</h1>
+    <h3><small>Welcome {{session.name}}</small></h3>
+    <hr>
+
+    <table class="table table-striped">
+        
+        <tr>
+            <th>Order ID</th>
+            <th>Table Number</th>
+            <th>Total</th>
+            <th>Covers</th>
+            <th>Date Opened</th>
+
+       
+        </tr>
+        {% for hist in History %}
+       <tr>
+            <td>{{hist.order_id}}</td>
+            <td>{{hist.table_id}}</td>
+            <td>{{hist.subtotal}}</td>
+            <td>{{hist.covers}}</td>
+            <td>{{hist.date}}</td>
+
+        {% endfor %}
+           
+           
+    </table>
+
+
+{% endblock %}

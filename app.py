@@ -41,6 +41,20 @@ mysql= MySQL(app)
 def floor():
         return render_template('restaurant_floor.html')
 
+#Bill History
+@app.route('/bill_history')
+@is_logged_in
+@is_manager
+def bill_history():
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id GROUP BY order_item.order_id;")
+        
+        History = cur.fetchall()
+        cur.close()
+       
+        return render_template('bill_history.html', History = History)
+
+
 
 #tables
 @app.route('/tables/<string:id>')
@@ -88,7 +102,7 @@ def opentable(id):
                      
                 covers = form.covers.data
                 cur = mysql.connection.cursor()
-                cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s WHERE table_id = %s;",("1", covers, id))
+                cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s, date = NOW() WHERE table_id = %s;",("1", covers, id))
                 mysql.connection.commit()
                 cur.close()
                 mess = ('Table ' + (id)  +' Opened!')

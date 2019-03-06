@@ -28,8 +28,9 @@
         <tr><th>Name</th>
         <th>Price</th>
         <th>Product ID</th>
+        <th>Stock</th>
         <th>Quantity</th>
-        <th></th>
+        
         <th></th>
 
     </tr>
@@ -40,13 +41,14 @@
                     <td><input type = "text" name = "Name" value="{{drink.name}}" disabled="true"/></td>
                     <td><input type = "text" name = "Price" value="£{{drink.price}}" disabled="true"/></td>
                     <td><input type = "number" style="width: 45px;" name = "product_id" value="{{drink.product_id}}" disabled="true"/></td>
+                    <td><input type = "number" style ="width:45px;" name = "stock" value="{{drink.stock}}"disabled="true"/></td>
                     <td><input type="button" id ='SubButton{{drink.product_id}}' value = "-">
-                    <input type="number" min= "0" name="quantity{{drink.product_id}}" style="width: 30px;" id="quantity{{drink.product_id}}">
+                    <input type="number" min= "0" name="quantity{{drink.product_id}}" style="width: 30px;" id="quantity{{drink.product_id}}" value =0>
                     <input type="button" id ='AddButton{{drink.product_id}}' value = "+">
                     <script>
                     $('#SubButton{{drink.product_id}}').on('click', function () {
-                    var input = $(parseInt('#quantity{{drink.product_id}}'));
-                    if (parseInt(input.val != 0)){
+                    var input = $('#quantity{{drink.product_id}}');
+                    if (parseInt(input.val()) != 0){
                         input.val(parseInt(input.val()) - 1);
                         }
                     })               
@@ -58,10 +60,11 @@
                      })
                     </script>
                     </td>
-                 
-                    <td><input type = "Submit" value = "Add to Order"></input></td>
-                  
-                   
+                    {% if drink.stock > 0 %}
+                        <td><input type = "Submit" value = "Add to Order"></input></td>
+                    {% else %}
+                        <td><input type = "Submit" value = "Add to Order" disabled="true"></input></td>
+                    {% endif %}
                    
                 
 

@@ -56,14 +56,16 @@
                     <script>
                         $('#AddButton{{drink.product_id}}').on('click', function () {
                         var input = $('#quantity{{drink.product_id}}');
-                        input.val(parseInt(input.val()) + 1);
-                     })
+                        if (parseInt(input.val()) < {{drink.stock}} ){
+                            input.val(parseInt(input.val()) + 1);
+                        }
+                    })    
                     </script>
                     </td>
                     {% if drink.stock > 0 %}
-                        <td><input type = "Submit" value = "Add to Order"></input></td>
+                        <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
                     {% else %}
-                        <td><input type = "Submit" value = "Add to Order" disabled="true"></input></td>
+                        <td><input class = "btn btn-disabled" type = "Submit" value = "Add to Order" disabled="true"></input></td>
                     {% endif %}
                    
                 

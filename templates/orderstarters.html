@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1>Starters</h1>
+
+<hr>
+{% for starter in starters %}
+
+
+<form  action = "http://localhost:5000/tables/{{table_id}}/add_to_table/{{order_id}}/{{starter.product_id}}/{{starter.price}}/" method = "POST">
+      
+
+<table class="table table-striped">
+        <tr><th>Name</th>
+        <th>Price</th>
+        <th>Product ID</th>
+        <th>Stock</th>
+        <th>Quantity</th>
+        
+        <th></th>
+
+    </tr>
+
+  
+            <tr>
+                
+                    <td><input type = "text" name = "Name" value="{{starter.name}}" disabled="true"/></td>
+                    <td><input type = "text" name = "Price" value="£{{starter.price}}" disabled="true"/></td>
+                    <td><input type = "number" style="width: 45px;" name = "product_id" value="{{starter.product_id}}" disabled="true"/></td>
+                    <td><input type = "number" style ="width:45px;" name = "stock" value="{{starter.stock}}"disabled="true"/></td>
+                    <td><input type="button" id ='SubButton{{starter.product_id}}' value = "-">
+                    <input type="number" min= "0" name="quantity{{starter.product_id}}" style="width: 30px;" id="quantity{{starter.product_id}}" value =0>
+                    <input type="button" id ='AddButton{{starter.product_id}}' value = "+">
+                    <script>
+                    $('#SubButton{{starter.product_id}}').on('click', function () {
+                    var input = $('#quantity{{starter.product_id}}');
+                    if (parseInt(input.val()) != 0){
+                        input.val(parseInt(input.val()) - 1);
+                        }
+                    })               
+                    </script>
+                    <script>
+                        $('#AddButton{{starter.product_id}}').on('click', function () {
+                        var input = $('#quantity{{starter.product_id}}');
+                        if (parseInt(input.val()) < {{starter.stock}} ){
+                            input.val(parseInt(input.val()) + 1);
+                        }
+                    })    
+                    </script>
+                    </td>
+                    {% if starter.stock > 0 %}
+                        <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
+                    {% else %}
+                        <td><input  type = "Submit" value = "Add to Order" disabled="true"></input></td>
+                    {% endif %}
+                   
+                
+
+                </tr>
+            
+    {% endfor %}  
+</table>
+
+    
+</form>
+<hr>
+
+
+{% endblock %}

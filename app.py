@@ -25,7 +25,7 @@ def is_logged_in(f):
                         flash("You must be logged in to access this page", 'danger')
                         return redirect(url_for('login'))
         return wrap
-
+#manager check - checks if the logged in user is a manager, managers can access stock management and user management.
 def is_manager(f):
         @wraps(f)
         def wrap(*args, **kwargs):
@@ -41,6 +41,8 @@ mysql= MySQL(app)
 def floor():
         return render_template('restaurant_floor.html')
 
+
+#tables
 @app.route('/tables/<string:id>')
 @is_logged_in
 def tables(id):
@@ -57,8 +59,13 @@ def tables(id):
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 1 GROUP BY product.name;").format(order_id, id))
         drinks = cur1.fetchall()
        
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name;").format(order_id, id))
+        starters = cur1.fetchall()
+
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name;").format(order_id, id))
         mains = cur1.fetchall()
+
+        
 
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
@@ -67,7 +74,7 @@ def tables(id):
         print(total)
         cur.close()
         
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks, mains = mains, total = total, order_id = order_id)
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, total = total, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -143,6 +150,22 @@ def ordermains(table_id):
         cur.close()
 
         return render_template('ordermains.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
+
+#add starters
+@app.route('/tables/<string:table_id>/orderstarters')
+@is_logged_in
+def orderstarters(table_id):
+        
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
+        starters= cur.fetchall()
+        print(starters)
+        cur.execute("SELECT order_id FROM tables where table_id = %s;",(table_id))
+        order_id = cur.fetchone()
+        order_id = str(order_id)
+        cur.close()
+
+        return render_template('orderstarters.html', starters = starters, order_id = order_id[14:-2], table_id = table_id)
 
 #add to order
 @app.route('/tables/<string:id>/add_to_table/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])

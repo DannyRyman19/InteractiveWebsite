@@ -7,7 +7,7 @@
         {{order_id}}
         <hr>
         <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
-            <a class="btn btn-success" href="/tables/{{id}}/starters">Starters</a>
+            <a class="btn btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
             <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
@@ -56,11 +56,14 @@
             <th>Sub Total</th>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            {% for starter in starters %}
+            <td>{{starter.quantity}}</td>
+            <td>{{starter.name}}</td>
+            <td>{{starter.price}}</td>
+            <td>{{starter.subtotal}}</td>
         </tr>
+        
+        {% endfor %}
     </table>
 
     <hr>

@@ -4,14 +4,14 @@
 
     {% if tables.active ==  1 %}
         <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
-        <h4>Order ID: {{order_id}}</h4>
+        {{order_id}}
         <hr>
         <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
             <a class="btn btn-success" href="/tables/{{id}}/starters">Starters</a>
             <a class="btn btn-success" href="/tables/{{id}}/mains">Mains</a>
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
-            <div class="float-right"><h2>Total Bill £{{tables.total_cost}}</h2></div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a>
+            <div class="float-right"><h2>Total Bill £{{total}}</h2></div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a>
     {% else %}
         <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
         <hr>
@@ -21,24 +21,29 @@
    
     <div>
             
-            
     </div>
 
     <hr>
     <h3>Drinks</h3>
     <table class="table table-striped">
+           
         <tr>
+           
             <th>Quantity</th>
             <th>Name</th>
             <th>Price</th>
             <th>Sub Total</th>
         </tr>
+      
         <tr>
-            <td>{{drinks.quantity}}</td>
-            <td>{{drinks.name}}</td>
-            <td>{{drinks.price}}</td>
-            <td>{{drinks.price}}</td>
+            {% for drink in drinks %}
+            <td>{{drink.quantity}}</td>
+            <td>{{drink.name}}</td>
+            <td>{{drink.price}}</td>
+            <td>{{drink.subtotal}}</td>
         </tr>
+        
+        {% endfor %}
     </table>
 
     <hr>

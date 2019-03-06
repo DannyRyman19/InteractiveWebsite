@@ -45,17 +45,27 @@ def floor():
 @is_logged_in
 def tables(id):
         cur = mysql.connection.cursor()
+        cur1 = mysql.connection.cursor()
         cur.execute("SELECT * FROM tables where table_id = %s;",(id))
         tables = cur.fetchone()
         cur.execute("SELECT order_id FROM tables where table_id = %s;",(id))
         order_id = cur.fetchone()
-        cur.execute("SELECT * FROM order_item, product, tables, product_variation, category, sub_category where product.product_id = product_variation.product_id and product.subcategory_id = sub_category.subcategory_id and category.category_id = sub_category.category_id and category.category_id = 1 AND tables.table_id = %s AND tables.order_id = order_item.order_id and tables.order_id = %s;",(id, order_id ))
-        drinks = cur.fetchall()
-        cur.execute("UPDATE order_item, tables SET order_item.order_id = %s WHERE order_item.table_id = tables.table_id AND tables.table_ID = %s",(order_id, id))
-        cur.close()
+        print(order_id)
         order_id = str(order_id)
-        #itemtotal = int(itemsubtotal.quantity * itemsubtotal.price) 
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks, order_id = order_id[14:-2])
+        order_id = order_id[14:-2]
+       
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} GROUP BY product.name;").format(order_id, id))
+        drinks = cur1.fetchall()
+        print(drinks)
+
+        cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
+        total = cur.fetchone()
+        total = str(total)
+        total = total[19:-3]
+        print(total)
+        cur.close()
+        
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks, total = total, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -79,17 +89,21 @@ def opentable(id):
         return render_template('open_table.html', form = form)
 
 #add drinks
-@app.route('/tables/<string:product_id>/orderdrinks')
+@app.route('/tables/<string:table_id>/orderdrinks')
 @is_logged_in
-def orderdrinks(product_id):
+def orderdrinks(table_id):
         
        
         cur = mysql.connection.cursor()
 
         cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
-        
+      
        
         sub_categories = cur.fetchall()
+
+        cur.execute("SELECT order_id FROM tables where table_id = %s;",(table_id))
+        order_id = cur.fetchone()
+        order_id = str(order_id)
         cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
@@ -104,7 +118,33 @@ def orderdrinks(product_id):
 
        #SELECT *FROM product, product_variation, category, sub_category WHERE product.subcategory_id = 6 AND product.product_id = product_variation.product_id AND category.category_id = sub_category.category_id AND category.category_id = 1 AND sub_category.subcategory_id = 6;
 
-        return render_template('orderdrinks.html', sub_categories = sub)
+        return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
+
+
+#add to order
+@app.route('/tables/<string:id>/add_to_table/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
+@is_logged_in
+def add_to_order(id, order_id, product_id, price):
+        quantity = request.form
+        quantity = str(quantity)
+        quantity = int(quantity[36:-4])
+        price = float(price)
+
+        cur = mysql.connection.cursor()
+        cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
+        result= cur.fetchone()  
+        result = str(result)
+        result = result[9:-1]
+        result = int(result)
+        print (result)
+        if result > 0 :
+              cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})) WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
+        else:
+             cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id)  VALUES('{0}',{1},{2},{3},{4})").format(order_id, id, quantity, quantity * price, product_id))
+
+
+        mysql.connection.commit()
+        return redirect(url_for('floor'))
 
 
 
@@ -113,7 +153,7 @@ def orderdrinks(product_id):
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE tables SET active = %s, covers = %s, total_cost = %s, order_id = NULL WHERE table_id = %s;",(0,0,0.00,id))
+        cur.execute("UPDATE tables SET active = %s, covers = %s, order_id = NULL WHERE table_id = %s;",(0,0,id))
         mysql.connection.commit()
         cur.close()
         
@@ -264,8 +304,8 @@ def drinks():
 @app.route('/starters')
 def starters():
         cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
-
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
+ 
         starters= cur.fetchall()
         cur.close()
        
@@ -314,7 +354,7 @@ def mains():
 @app.route('/desserts')
 def desserts():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id =  and category.category_id = 5;")
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 5  and category.category_id = 5;")
 
         desserts = cur.fetchall()
         cur.close()

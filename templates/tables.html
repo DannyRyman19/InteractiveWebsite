@@ -6,12 +6,33 @@
         <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
         {{order_id}}
         <hr>
+        
         <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
             <a class="btn btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
             <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
             <div class="float-right"><h2>Total Bill £{{total}}</h2></div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a>
+            <script>
+                $(document).ready( function () {
+                  $('#all').DataTable();
+              } );
+                    $(document).ready( function () {
+                  $('#drinks').DataTable();
+              } );
+              $(document).ready( function () {
+                  $('#starters').DataTable();
+              } );
+              $(document).ready( function () {
+                  $('#Mains').DataTable();
+              } );
+              $(document).ready( function () {
+                  $('#Sides').DataTable();
+              } );
+              $(document).ready( function () {
+                  $('#Desserts').DataTable();
+              } );
+            </script>
     {% else %}
         <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
         <hr>
@@ -24,51 +45,146 @@
     </div>
 
     <hr>
+    <h3>All Items</h3>
+    <table id ="all" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                </tfoot>
+                <tbody>
+                        {% for drink in drinks %}
+                    
+                    <tr>
+                            <td>{{drink.quantity}}</td>
+                            <td>{{drink.name}}</td>
+                            <td>{{drink.price}}</td>
+                            <td>{{drink.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for starter in starters %}
+                    
+                    <tr>
+                            <td>{{starter.quantity}}</td>
+                            <td>{{starter.name}}</td>
+                            <td>{{starter.price}}</td>
+                            <td>{{starter.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for main in mains %}
+                    
+                    <tr>
+                            <td>{{main.quantity}}</td>
+                            <td>{{main.name}}</td>
+                            <td>{{main.price}}</td>
+                            <td>{{main.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for side in sides %}
+                    
+                    <tr>
+                            <td>{{side.quantity}}</td>
+                            <td>{{side.name}}</td>
+                            <td>{{side.price}}</td>
+                            <td>{{side.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for dessert in desserts %}
+                    
+                        <tr>
+                                <td>{{dessert.quantity}}</td>
+                                <td>{{dessert.name}}</td>
+                                <td>{{dessert.price}}</td>
+                                <td>{{dessert.subtotal}}</td>
+                            </tr>
+                            
+                            {% endfor %}
+                    
+                </tbody>   
+    </table>
+    <hr>
     <h3>Drinks</h3>
-    <table class="table table-striped">
-           
-        <tr>
-           
-            <th>Quantity</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Sub Total</th>
-        </tr>
-      
-        <tr>
-            {% for drink in drinks %}
-            <td>{{drink.quantity}}</td>
-            <td>{{drink.name}}</td>
-            <td>{{drink.price}}</td>
-            <td>{{drink.subtotal}}</td>
-        </tr>
-        
-        {% endfor %}
+    <table id ="drinks" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                </tfoot>
+                <tbody>
+                        {% for drink in drinks %}
+                    
+                    <tr>
+                            <td>{{drink.quantity}}</td>
+                            <td>{{drink.name}}</td>
+                            <td>{{drink.price}}</td>
+                            <td>{{drink.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+                    
+                </tbody>   
     </table>
 
     <hr>
     <h3>Starters</h3>
-    <table class="table table-striped">
-        <tr>
-            <th>Quantity</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Sub Total</th>
-        </tr>
-        <tr>
-            {% for starter in starters %}
-            <td>{{starter.quantity}}</td>
-            <td>{{starter.name}}</td>
-            <td>{{starter.price}}</td>
-            <td>{{starter.subtotal}}</td>
-        </tr>
-        
-        {% endfor %}
+    <table id = "starters" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                </tfoot>
+                <tbody>
+                        {% for starter in starters %}
+                    
+                    <tr>
+                            <td>{{starter.quantity}}</td>
+                            <td>{{starter.name}}</td>
+                            <td>{{starter.price}}</td>
+                            <td>{{starter.subtotal}}</td>
+                        </tr>
+                        {% endfor %}
+                    
+                </tbody>   
     </table>
 
     <hr>
     <h3>Mains</h3>
-    <table class="table table-striped">
+    <table id = "Mains" class="table table-striped table-bordered" cellspacing="0" width="100%">
         <tr>
             <th>Quantity</th>
             <th>Name</th>
@@ -88,7 +204,7 @@
 
     <hr>
     <h3>Sides</h3>
-    <table class="table table-striped">
+    <table id ="Sides" class="table table-striped table-bordered" cellspacing="0" width="100%">
         <tr>
             <th>Quantity</th>
             <th>Name</th>
@@ -105,7 +221,7 @@
 
     <hr>
     <h3>Desserts</h3>
-    <table class="table table-striped">
+    <table id="Desserts"class="table table-striped table-bordered" cellspacing="0" width="100%">
         <tr>
             <th>Quantity</th>
             <th>Name</th>

@@ -185,54 +185,99 @@
     <hr>
     <h3>Mains</h3>
     <table id = "Mains" class="table table-striped table-bordered" cellspacing="0" width="100%">
-        <tr>
-            <th>Quantity</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Sub Total</th>
-        </tr>
-        <tr>
-            {% for main in mains %}
-            <td>{{main.quantity}}</td>
-            <td>{{main.name}}</td>
-            <td>{{main.price}}</td>
-            <td>{{main.subtotal}}</td>
-        </tr>
-        
-        {% endfor %}
+            <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                </tfoot>
+                <tbody>
+                   
+                        {% for main in mains %}
+                    <tr>
+                        <td>{{main.quantity}}</td>
+                        <td>{{main.name}}</td>
+                        <td>{{main.price}}</td>
+                        <td>{{main.subtotal}}</td>
+                    </tr>
+                    
+                    {% endfor %}
+                    
+                </tbody>   
+       
+          
     </table>
 
     <hr>
     <h3>Sides</h3>
     <table id ="Sides" class="table table-striped table-bordered" cellspacing="0" width="100%">
-        <tr>
-            <th>Quantity</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Sub Total</th>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+            <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                </tfoot>
+                <tbody>
+                   
+                        {% for side in sides %}
+                    <tr>
+                        <td>{{side.quantity}}</td>
+                        <td>{{side.name}}</td>
+                        <td>{{side.price}}</td>
+                        <td>{{side.subtotal}}</td>
+                    </tr>
+                    
+                    {% endfor %}
+                    
+                </tbody>   
+       
     </table>
 
     <hr>
     <h3>Desserts</h3>
     <table id="Desserts"class="table table-striped table-bordered" cellspacing="0" width="100%">
-        <tr>
-            <th>Quantity</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Sub Total</th>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+            <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                        <th>Quantity</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sub Total</th>
+                </tfoot>
+                <tbody>
+                   
+                        {% for dessert in desserts %}
+                    <tr>
+                        <td>{{dessert.quantity}}</td>
+                        <td>{{dessert.name}}</td>
+                        <td>{{dessert.price}}</td>
+                        <td>{{dessert.subtotal}}</td>
+                    </tr>
+                    
+                    {% endfor %}
+                    
+                </tbody>   
     </table>
 {% endblock %}

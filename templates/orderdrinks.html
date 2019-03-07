@@ -12,17 +12,13 @@
         }
         </style>
 <h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
-{% for drink in category[1] %}
-<form id = "Form{{category[2]}}" action = "http://localhost:5000/tables/{{table_id}}/add_to_table/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
-      
-
-
 <script>
         $("#btn{{category[2]}}").click(function(){
         $("#Form{{category[2]}}").toggle();
       
     });
 </script>
+{% for drink in category[1] %}
 
 <table class="table table-striped">
         <tr><th>Name</th>
@@ -37,7 +33,7 @@
 
   
             <tr>
-                
+                    <form id = "Form{{category[2]}}" action = "http://localhost:5000/tables/{{table_id}}/add_to_table/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
                     <td><input type = "text" name = "Name" value="{{drink.name}}" disabled="true"/></td>
                     <td><input type = "text" name = "Price" value="£{{drink.price}}" disabled="true"/></td>
                     <td><input type = "number" style="width: 45px;" name = "product_id" value="{{drink.product_id}}" disabled="true"/></td>
@@ -65,18 +61,18 @@
                     {% if drink.stock > 0 %}
                         <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
                     {% else %}
-                        <td><input class = "btn btn-disabled" type = "Submit" value = "Add to Order" disabled="true"></input></td>
+                        <td><input  type = "Submit" value = "Add to Order" disabled="true"></input></td>
                     {% endif %}
                    
                 
 
                 </tr>
-            
+            </form>
     {% endfor %}  
 </table>
 
     
-</form>
+
 <hr>
 {% endfor %}
 

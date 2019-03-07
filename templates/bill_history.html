@@ -14,6 +14,7 @@
             <th>Total</th>
             <th>Covers</th>
             <th>Date Opened</th>
+            <th>Date Closed</th>
 
        
         </tr>
@@ -21,9 +22,11 @@
        <tr>
             <td>{{hist.order_id}}</td>
             <td>{{hist.table_id}}</td>
-            <td>{{hist.subtotal}}</td>
+            <td>{{hist.total}}</td>
             <td>{{hist.covers}}</td>
-            <td>{{hist.date}}</td>
+            <td>{{hist.date_opened}}</td>
+            <td>{{hist.date_closed}}</td>
+
 
         {% endfor %}
            

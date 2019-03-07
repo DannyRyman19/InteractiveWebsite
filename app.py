@@ -47,7 +47,7 @@ def floor():
 @is_manager
 def bill_history():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id GROUP BY order_item.order_id;")
+        cur.execute("SELECT * FROM bill_history ORDER BY date_closed DESC")
         
         History = cur.fetchall()
         cur.close()
@@ -209,6 +209,14 @@ def add_to_order(id, order_id, product_id, price):
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
+        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
+        results = cur.fetchone()
+        covers =int(results['covers'])
+        table_id =int(results['table_id'])
+        date = results['date']
+        order_id = results['order_id']
+        subtotal = float(results['subtotal'])
+        cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date))
         cur.execute("UPDATE tables SET active = %s, covers = %s, order_id = NULL WHERE table_id = %s;",(0,0,id))
         mysql.connection.commit()
         cur.close()

@@ -19,6 +19,7 @@
                 <th>Covers</th>
                 <th>Date Opened</th>
                 <th>Date Closed</th>
+                <th></th>
             </tr>
         </thead>
         <tfoot>
@@ -29,6 +30,7 @@
                 <th>Covers</th>
                 <th>Date Opened</th>
                 <th>Date Closed</th>
+                <th></th>
             </tr>
         </tfoot>
         <tbody>
@@ -40,6 +42,7 @@
                 <td>{{hist.covers}}</td>
                 <td>{{hist.date_opened}}</td>
                 <td>{{hist.date_closed}}</td>
+                <td><a href ='/bill_history/{{hist.order_id}}' class="btn btn-success">View Full Details</a></td>
             </tr>
             {% endfor %}
         </tbody>

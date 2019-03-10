@@ -2,16 +2,14 @@
 
 {% block body %}
 
-    {% if tables.active ==  1 %}
-        <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
-        {{order_id}}
+    
+        <h1>Table Number {{id}}<div class="float-right">Seats:{{history.covers}}</div></h1>
+        {{order_id}} 
         <hr>
-        <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
-            <a class="btn btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
-            <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
-            <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
-            <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
-            <div class="float-right"><h2>Total Bill £{{total}}</h2></div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a>
+        <p>Date Opened: {{history.date_opened}}</p>
+        <p>Date Closed: {{history.date_closed}}</p>
+
+            <div class="float-right"><h2>Total Bill £{{total}}</h2></div>
             <script>
                 $(document).ready( function () {
                   $('#all').DataTable();
@@ -32,12 +30,7 @@
                   $('#Desserts').DataTable();
               } );
             </script>
-    {% else %}
-        <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
-        <hr>
-        
-            <div class="float-right"><h2>Total Bill £0.00</h2></div><a class="btn btn-primary" href="/tables/opentable/{{id}}/">Open Table</a>
-    {% endif %}
+
    
     <div>
             

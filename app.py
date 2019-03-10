@@ -54,6 +54,36 @@ def bill_history():
        
         return render_template('bill_history.html', History = History)
 
+#Individual bill history
+@app.route('/bill_history/<string:order_id>')
+@is_logged_in
+def individual_bill_history(order_id):
+        cur = mysql.connection.cursor()
+        cur1 = mysql.connection.cursor()
+        cur.execute(("SELECT table_id FROM order_item WHERE order_item.order_id = '{0}';").format(order_id))
+        id = cur.fetchone()
+        id = id['table_id']
+        
+        cur.execute(("SELECT * FROM bill_history WHERE order_id = '{0}' ORDER BY date_closed DESC").format(order_id))
+        history = cur.fetchone()
+        print(history)
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE  order_item.order_id = '{0}' AND order_item.table_id = {1} and sub_category.category_id = 1 GROUP BY product.name;").format(order_id, id))
+        drinks = cur1.fetchall()
+        
+        print(drinks)
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name;").format(order_id, id))
+        starters = cur1.fetchall()
+
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name;").format(order_id, id))
+        mains = cur1.fetchall()
+
+        cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
+        total = cur.fetchone()
+        total = total['total']
+        cur.close()
+        
+        return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, total = total, order_id = order_id)
+
 
 
 #tables
@@ -215,7 +245,7 @@ def close_table(id):
         return redirect(url_for('floor'))
 
 class TableForm(Form):
-        covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3')])
+        covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6'),('7','7'),('8','8'),('9','9'),('10','10'),('11','11'),('12','12'),('13','13'),('14','14'),('15','15')])
      
 @app.route('/')
 def index():

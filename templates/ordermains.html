@@ -13,7 +13,7 @@
         </style>
 <h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
 {% for main in category[1] %}
-<form id = "Form{{category[2]}}" action = "http://localhost:5000/tables/{{table_id}}/add_to_table/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
+<form id = "Form{{category[2]}}" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
       
 
 

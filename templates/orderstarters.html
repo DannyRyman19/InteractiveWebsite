@@ -7,7 +7,7 @@
 {% for starter in starters %}
 
 
-<form  action = "http://localhost:5000/tables/{{table_id}}/add_to_table/{{order_id}}/{{starter.product_id}}/{{starter.price}}/" method = "POST">
+<form  action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{starter.product_id}}/{{starter.price}}/" method = "POST">
       
 
 <table class="table table-striped">

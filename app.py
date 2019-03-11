@@ -99,7 +99,7 @@ def tables(id):
         order_id = order_id['order_id']
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 1 GROUP BY product.name, order_item.message;").format(order_id, id))
         drinks = cur1.fetchall()
-       
+        print(drinks)
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name, order_item.message;").format(order_id, id))
         starters = cur1.fetchall()
 
@@ -131,7 +131,7 @@ def opentable(id):
                 mess = ('Table ' + (id)  +' Opened!')
                 flash(mess,'success')
 
-                return redirect(url_for('floor'))
+                return redirect(url_for('tables', id = id))
         return render_template('open_table.html', form = form)
 
 #add drinks
@@ -200,7 +200,7 @@ def orderstarters(table_id):
         return render_template('orderstarters.html', starters = starters, order_id = order_id[14:-2], table_id = table_id)
 
 #add to order
-@app.route('/tables/<string:id>/add_to_table/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
+@app.route('/tables/<string:id>/add_to_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
 @is_logged_in
 def add_to_order(id, order_id, product_id, price):
         formrequest = "quantity" + str(product_id)
@@ -227,7 +227,7 @@ def add_to_order(id, order_id, product_id, price):
         cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
 
         mysql.connection.commit()
-        return tables(id)
+        return redirect(url_for('tables', id = id, _external = True))
 
 
 
@@ -238,13 +238,15 @@ def close_table(id):
         cur = mysql.connection.cursor()
         cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
         results = cur.fetchone()
-        covers =int(results['covers'])
-        table_id =int(results['table_id'])
-        date = results['date']
-        order_id = results['order_id']
-        subtotal = float(results['subtotal'])
-        cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date))
-        cur.execute("UPDATE tables SET active = %s, covers = %s, order_id = NULL WHERE table_id = %s;",(0,0,id))
+        if str(results) != "None":
+                covers =int(results['covers'])
+                table_id =int(results['table_id'])
+                date = results['date']
+                order_id = results['order_id']
+                subtotal = float(results['subtotal'])
+                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date))
+  
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()
         

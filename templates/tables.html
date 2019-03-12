@@ -3,7 +3,7 @@
 {% block body %}
 
     {% if tables.active ==  1 %}
-        <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
+        <h1>Table Number {{id}}<div class="float-right">Seats:<input id="covers" type ="text" style="width: 45px" value="{{tables.covers}}"></div></h1>
         {{order_id}}
         <hr>
         <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
@@ -12,11 +12,21 @@
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
             {% if tables.covers >= 7 %}
-                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
+                <div><input type="button" onclick="printDiv('printableArea')" value="Print Bill"><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
             {% else %}
-                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill £{{tables.total}}</h2></div>
+                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><input class="btn btn-primary float-right" type="button" onclick="printDiv('printableArea')" value="Print Bill"><h2>Total Bill £{{tables.total}}</h2></div>
             {% endif %}
-            <hr>
+            
+            <script>
+            function printDiv(divName) {
+                var printContents = document.getElementById(divName).innerHTML;
+                var originalContents = document.body.innerHTML;
+                document.body.innerHTML = printContents;
+                window.print();
+
+                document.body.innerHTML = originalContents;
+                }
+            </script>
 
             <script>
                 $(document).ready( function () {
@@ -40,15 +50,90 @@
             </script>
     {% else %}
         <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
-        <hr>
+        <hr>    
         
             <div class="float-right"><h2>Total Bill £0.00</h2></div><a class="btn btn-primary" href="/tables/opentable/{{id}}/">Open Table</a>
     {% endif %}
-   
     <div>
-            
+        
     </div>
-
+    <div id="printableArea" style="display:none; align-content: center;">
+        <table class="table table-striped">
+            
+            <H1>Restaurant Name</H1>
+            <h4>Tel: 01234 567890</h4>
+            <hr>
+                        <tr>
+                            <th>Quantity</th>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                            {% for drink in drinks %}
+                        
+                        <tr>
+                                <td>{{drink.quantity}}</td>
+                                <td>{{drink.name}}</td>
+                                <td>{{drink.price}}</td>
+                                <td>{{drink.subtotal}}</td>
+                            </tr>
+                            
+                            {% endfor %}
+    
+                            {% for starter in starters %}
+                        
+                        <tr>
+                                <td>{{starter.quantity}}</td>
+                                <td>{{starter.name}}</td>
+                                <td>{{starter.price}}</td>
+                                <td>{{starter.subtotal}}</td>
+                            </tr>
+                            
+                            {% endfor %}
+    
+                            {% for main in mains %}
+                        
+                        <tr>
+                                <td>{{main.quantity}}</td>
+                                <td>{{main.name}}</td>
+                                <td>{{main.price}}</td>
+                                <td>{{main.subtotal}}</td>
+                            </tr>
+                            
+                            {% endfor %}
+    
+                            {% for side in sides %}
+                        
+                        <tr>
+                                <td>{{side.quantity}}</td>                            
+                                <td>{{side.name}}</td>
+                                <td>{{side.price}}</td>
+                                <td>{{side.subtotal}}</td>
+                            </tr>
+                            
+                            {% endfor %}
+    
+                            {% for dessert in desserts %}
+                        
+                            <tr>
+                                <td>{{dessert.quantity}}</td>
+                                <td>{{dessert.name}}</td>
+                                <td>{{dessert.price}}</td>
+                                <td>{{dessert.subtotal}}</td>
+                                {% endfor %}
+                            </tr>   
+        </table>
+        <br>
+        <br>   
+        {% if tables.covers >= 7 %} 
+            <h4 class="float-right">10% Service: £{{tables.service}}</h4>   
+            <h1 class="float-right">Total: £{{tables.totalservice}}</h1>   
+            <p>Bill Number: {{tables.order_id}}</p>
+        {% else %}
+            <h1 class="float-right">Total: £{{tables.total}}</h1>   
+            <p>Bill Number: {{tables.order_id}}</p>
+        {% endif %}
+    </div>
    
     <h3>All Items</h3>
     <table id ="all" class="table table-striped table-bordered" cellspacing="0" width="100%">

@@ -11,7 +11,13 @@
             <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
-            <div class="float-right"><h2>Total Bill £{{total}}</h2></div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a>
+            {% if tables.covers >= 7 %}
+                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
+            {% else %}
+                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill £{{tables.total}}</h2></div>
+            {% endif %}
+            <hr>
+
             <script>
                 $(document).ready( function () {
                   $('#all').DataTable();
@@ -43,7 +49,7 @@
             
     </div>
 
-    <hr>
+   
     <h3>All Items</h3>
     <table id ="all" class="table table-striped table-bordered" cellspacing="0" width="100%">
             <thead>

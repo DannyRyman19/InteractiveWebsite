@@ -109,14 +109,28 @@ def tables(id):
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
         total = total['total']
+        covers = tables['covers']
+        service = 0.00
+        totalservice = 0.00
         if str(total) != 'None':
-                cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
+                
+                if int(covers) < 7:
+                        cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
+                else:
+                        service = float(total / 10)
+                        totalservice = str(round(((float(total) + service)),2))
+                        cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
+                        cur.execute(("UPDATE tables SET service = {0} WHERE order_id = '{1}' AND table_id = {2}").format(service,order_id, id))
+                        cur.execute(("UPDATE tables SET totalservice = {0} WHERE order_id = '{1}' AND table_id = {2}").format(totalservice,order_id, id))
+
                 mysql.connection.commit()
+                
         else:
                 total = "0.0" + "0"
+
         cur.close()
         
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, total = total, order_id = order_id)
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -249,7 +263,7 @@ def close_table(id):
                 subtotal = float(results['subtotal'])
                 cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date))
   
-        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00 WHERE table_id = {0};").format(id))
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, totalservice = 0.00 WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()
         

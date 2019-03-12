@@ -100,10 +100,10 @@ def tables(id):
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 1 GROUP BY product.name, order_item.message;").format(order_id, id))
         drinks = cur1.fetchall()
         print(drinks)
-        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name, order_item.message;").format(order_id, id))
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name, order_item.message;").format(order_id, id))
         starters = cur1.fetchall()
 
-        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name;").format(order_id, id))
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name, order_item.message;").format(order_id, id))
         mains = cur1.fetchall()
 
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
@@ -211,27 +211,25 @@ def add_to_order(id, order_id, product_id, price):
         formrequest = "quantity" + str(product_id)
         quantity = request.form[formrequest]
         message = request.form.get("message" + str(product_id))  
-         
-        
-        
-        price = float(price)
-        cur = mysql.connection.cursor()
-        cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
-        result= cur.fetchone()  
-        result = result['exist']
-        if message == "":
-                if int(result) > 0 :
-                 cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})) WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
+        if int(quantity) > 0 :
+                price = float(price)
+                cur = mysql.connection.cursor()
+                cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
+                result= cur.fetchone()  
+                result = result['exist']
+                if message == "":
+                        if int(result) > 0 :
+                                cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})) WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
+                        else:
+                                cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id)  VALUES('{0}',{1},{2},{3},{4})").format(order_id, id, quantity, int(quantity) * price, product_id))
                 else:
-                        cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id)  VALUES('{0}',{1},{2},{3},{4})").format(order_id, id, quantity, int(quantity) * price, product_id))
-        else:
-                cur.execute(("INSERT INTO order_item(order_id, table_id, quantity, subtotal, product_id, message)  VALUES('{0}',{1},{2},{3},{4},'{5}')").format(order_id, id, quantity, int(quantity) * price, product_id, message))
+                        cur.execute(("INSERT INTO order_item(order_id, table_id, quantity, subtotal, product_id, message)  VALUES('{0}',{1},{2},{3},{4},'{5}')").format(order_id, id, quantity, int(quantity) * price, product_id, message))
                 
-
-
-        cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
-
-        mysql.connection.commit()
+                cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
+                mysql.connection.commit()
+                
+        else:
+                flash("Please add a valid quantity.", 'danger')
         return redirect(url_for('tables', id = id, _external = True))
 
 

@@ -7,20 +7,18 @@
 
 {% for category in sub_categories %}
 <style>
-        #Form{{category[2]}}{
+        #Table{{category[2]}}{
             display: none;
         }
         </style>
 <h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
 <script>
         $("#btn{{category[2]}}").click(function(){
-        $("#Form{{category[2]}}").toggle();
+        $("#Table{{category[2]}}").toggle();
       
     });
 </script>
-{% for drink in category[1] %}
-
-<table class="table table-striped">
+<table id="Table{{category[2]}}" class="table table-striped">
         <tr><th>Name</th>
         <th>Price</th>
         <th>Optional Message</th>
@@ -30,6 +28,9 @@
         <th></th>
 
     </tr>
+{% for drink in category[1] %}
+
+
 
   
             <tr>
@@ -37,7 +38,7 @@
                     <td>{{drink.name}}</td> 
                     <td>£{{drink.price}}</td>
                     <td><textarea style="width: 100px;" name = "message{{drink.product_id}}" id="message{{drink.product_id}}"></textarea></td>
-                    <td><input type = "number" style ="width:45px;" name = "stock" value="{{drink.stock}}"disabled="true"/></td>
+                    <td>{{drink.stock}}</td>
                     <td><input type="button" id ='SubButton{{drink.product_id}}' value = "-">
                     <input type="number" min= "0" name="quantity{{drink.product_id}}" style="width: 30px;" id="quantity{{drink.product_id}}" value =0>
                     <input type="button" id ='AddButton{{drink.product_id}}' value = "+">

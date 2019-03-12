@@ -109,6 +109,11 @@ def tables(id):
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
         total = total['total']
+        if str(total) != 'None':
+                cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
+                mysql.connection.commit()
+        else:
+                total = "0.0" + "0"
         cur.close()
         
         return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, total = total, order_id = order_id)
@@ -125,7 +130,7 @@ def opentable(id):
                      
                 covers = form.covers.data
                 cur = mysql.connection.cursor()
-                cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s, date = NOW() WHERE table_id = %s;",("1", covers, id))
+                cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s, total = 0.00, date = NOW() WHERE table_id = %s;",("1", covers, id))
                 mysql.connection.commit()
                 cur.close()
                 mess = ('Table ' + (id)  +' Opened!')
@@ -246,7 +251,7 @@ def close_table(id):
                 subtotal = float(results['subtotal'])
                 cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date))
   
-        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL WHERE table_id = {0};").format(id))
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00 WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()
         

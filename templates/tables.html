@@ -50,6 +50,7 @@
                     <tr>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                     </tr>
@@ -57,6 +58,7 @@
                 <tfoot>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                 </tfoot>
@@ -64,8 +66,9 @@
                         {% for drink in drinks %}
                     
                     <tr>
-                            <td><input type="number" value = "{{drink.quantity}}"></td>
+                            <td><input type="number" style="width:45px" value = "{{drink.quantity}}"></td>
                             <td>{{drink.name}}</td>
+                            <td>{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
                         </tr>
@@ -75,8 +78,9 @@
                         {% for starter in starters %}
                     
                     <tr>
-                            <td>{{starter.quantity}}</td>
+                            <td><input type="number" style="width:45px" value = "{{starter.quantity}}"></td>
                             <td>{{starter.name}}</td>
+                            <td>{{starter.message}}</td>
                             <td>{{starter.price}}</td>
                             <td>{{starter.subtotal}}</td>
                         </tr>
@@ -86,8 +90,9 @@
                         {% for main in mains %}
                     
                     <tr>
-                            <td>{{main.quantity}}</td>
+                            <td><input type="number" style="width:45px" value = "{{main.quantity}}"></td>
                             <td>{{main.name}}</td>
+                            <td>{{main.message}}</td>
                             <td>{{main.price}}</td>
                             <td>{{main.subtotal}}</td>
                         </tr>
@@ -97,8 +102,9 @@
                         {% for side in sides %}
                     
                     <tr>
-                            <td>{{side.quantity}}</td>
+                            <td><input type="number" style="width:45px" value = "{{side.quantity}}"></td>                            
                             <td>{{side.name}}</td>
+                            <td>{{side.message}}</td>
                             <td>{{side.price}}</td>
                             <td>{{side.subtotal}}</td>
                         </tr>
@@ -108,13 +114,14 @@
                         {% for dessert in desserts %}
                     
                         <tr>
-                                <td>{{dessert.quantity}}</td>
-                                <td>{{dessert.name}}</td>
-                                <td>{{dessert.price}}</td>
-                                <td>{{dessert.subtotal}}</td>
-                            </tr>
+                            <td><input type="number" style="width:45px" value = "{{dessert.quantity}}"></td>
+                            <td>{{dessert.name}}</td>
+                            <td>{{dessert.message}}</td>
+                            <td>{{dessert.price}}</td>
+                            <td>{{dessert.subtotal}}</td>
+                        </tr>
                             
-                            {% endfor %}
+                        {% endfor %}
                     
                 </tbody>   
     </table>
@@ -141,7 +148,7 @@
                         {% for drink in drinks %}
                     
                     <tr>
-                            <td>{{drink.quantity}}</td>
+                            <td><input type="number" style="width:45px" value = "{{drink.quantity}}"></td>
                             <td>{{drink.name}}</td>
                             <td>{{drink.message}}</td>
                             <td>{{drink.price}}</td>
@@ -160,6 +167,7 @@
                     <tr>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                     </tr>
@@ -167,6 +175,7 @@
                 <tfoot>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                 </tfoot>
@@ -174,8 +183,9 @@
                         {% for starter in starters %}
                     
                     <tr>
-                            <td>{{starter.quantity}}</td>
+                            <td><input type="number" style="width:45px" value = "{{starter.quantity}}"></td>
                             <td>{{starter.name}}</td>
+                            <td>{{starter.message}}</td>
                             <td>{{starter.price}}</td>
                             <td>{{starter.subtotal}}</td>
                         </tr>
@@ -191,6 +201,7 @@
                     <tr>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                     </tr>
@@ -198,6 +209,7 @@
                 <tfoot>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                 </tfoot>
@@ -205,8 +217,9 @@
                    
                         {% for main in mains %}
                     <tr>
-                        <td>{{main.quantity}}</td>
+                        <td><input type="number" style="width:45px" value = "{{main.quantity}}"></td>
                         <td>{{main.name}}</td>
+                        <td>{{main.message}}</td>
                         <td>{{main.price}}</td>
                         <td>{{main.subtotal}}</td>
                     </tr>
@@ -225,6 +238,7 @@
                     <tr>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                     </tr>
@@ -232,6 +246,7 @@
                 <tfoot>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                 </tfoot>
@@ -239,8 +254,9 @@
                    
                         {% for side in sides %}
                     <tr>
-                        <td>{{side.quantity}}</td>
+                        <td><input type="number" style="width:45px"  value = "{{side.quantity}}"></td>                                                    
                         <td>{{side.name}}</td>
+                        <td>{{side.message}}</td>
                         <td>{{side.price}}</td>
                         <td>{{side.subtotal}}</td>
                     </tr>
@@ -258,6 +274,7 @@
                     <tr>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                     </tr>
@@ -265,6 +282,7 @@
                 <tfoot>
                         <th>Quantity</th>
                         <th>Name</th>
+                        <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                 </tfoot>
@@ -272,8 +290,9 @@
                    
                         {% for dessert in desserts %}
                     <tr>
-                        <td>{{dessert.quantity}}</td>
+                        <td><input type="number" style="width:45px" value = "{{dessert.quantity}}"></td>                        
                         <td>{{dessert.name}}</td>
+                        <td>{{dessert.message}}</td>
                         <td>{{dessert.price}}</td>
                         <td>{{dessert.subtotal}}</td>
                     </tr>

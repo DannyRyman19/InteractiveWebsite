@@ -12,11 +12,14 @@
             <a class="btn btn-success" href="/tables/{{id}}/sides">Sides</a>
             <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
             {% if tables.covers >= 7 %}
-                <div><input type="button" onclick="printDiv('printableArea')" value="Print Bill"><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
+                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
             {% else %}
-                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><input class="btn btn-primary float-right" type="button" onclick="printDiv('printableArea')" value="Print Bill"><h2>Total Bill £{{tables.total}}</h2></div>
+                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill £{{tables.total}}</h2></div>
             {% endif %}
-            
+            <input type="button" class="btn btn-primary float-right" onclick="printDiv('printableArea')" value="Print Bill">
+            <br>
+            <hr>
+
             <script>
             function printDiv(divName) {
                 var printContents = document.getElementById(divName).innerHTML;
@@ -60,9 +63,10 @@
     <div id="printableArea" style="display:none; align-content: center;">
         <table class="table table-striped">
             
-            <H1>Restaurant Name</H1>
+            <H1 style="align-content: center">Restaurant Name</H1>
             <h4>Tel: 01234 567890</h4>
-            <hr>
+            
+            
                         <tr>
                             <th>Quantity</th>
                             <th>Item</th>
@@ -126,9 +130,11 @@
         <br>
         <br>   
         {% if tables.covers >= 7 %} 
-            <h4 class="float-right">10% Service: £{{tables.service}}</h4>   
-            <h1 class="float-right">Total: £{{tables.totalservice}}</h1>   
-            <p>Bill Number: {{tables.order_id}}</p>
+            <div style="text-align:right">
+            <h4>Subtotal: £{{tables.total}}</h4>   
+            <h4 >10% Service: £{{tables.service}}</h4>  
+            <h1>Total: £{{tables.totalservice}}</h1>   
+            <p>Bill Number: {{tables.order_id}}</p></div>
         {% else %}
             <h1 class="float-right">Total: £{{tables.total}}</h1>   
             <p>Bill Number: {{tables.order_id}}</p>

@@ -102,7 +102,11 @@ def daily_summary():
         cur.execute(("SELECT sum(covers) as DailyCovers FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
         DailyCovers = cur.fetchone()
         DailyCovers = DailyCovers['DailyCovers']
-        return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables, displayDate = displayDate)
+        cur.execute(("SELECT order_item.product_id, order_item.quantity, order_item.subtotal, product.name FROM restaurant.order_item, restaurant.product WHERE last_order_time LIKE '%{0}%' AND order_item.product_id = product.product_id;").format(date))
+        DailyItems = cur.fetchall()
+        print(DailyItems)
+        cur.close()
+        return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables, displayDate = displayDate, DailyItems= DailyItems)
 
 
 #tables
@@ -286,11 +290,11 @@ def add_to_order(id, order_id, product_id, price):
                 result = result['exist']
                 if message == "":
                         if int(result) > 0 :
-                                cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})) WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
+                                cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})), last_order_time = NOW()  WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
                         else:
-                                cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id)  VALUES('{0}',{1},{2},{3},{4})").format(order_id, id, quantity, int(quantity) * price, product_id))
+                                cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
                 else:
-                        cur.execute(("INSERT INTO order_item(order_id, table_id, quantity, subtotal, product_id, message)  VALUES('{0}',{1},{2},{3},{4},'{5}')").format(order_id, id, quantity, int(quantity) * price, product_id, message))
+                        cur.execute(("INSERT INTO order_item(order_id, table_id, quantity, subtotal, product_id, message, last_order_time)  VALUES('{0}',{1},{2},{3},{4},'{5}',NOW())").format(order_id, id, quantity, int(quantity) * price, product_id, message))
                 
                 cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
                 mysql.connection.commit()

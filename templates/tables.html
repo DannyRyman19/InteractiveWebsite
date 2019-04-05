@@ -10,7 +10,7 @@
             <a class="btn btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
             <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
             <a class="btn btn-success" href="/tables/{{id}}/ordersides">Sides</a>
-            <a class="btn btn-success" href="./tables/{{id}}/desserts">Desserts</a>
+            <a class="btn btn-success" href="./{{id}}/orderdesserts">Desserts</a>
             {% if tables.covers >= 7 %}
                 <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
             {% else %}

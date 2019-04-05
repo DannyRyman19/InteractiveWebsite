@@ -189,7 +189,7 @@ def orderdrinks(table_id):
 
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))
         order_id = cur.fetchone()
-        order_id = str(order_id)
+        order_id = order_id['order_id']
         cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
@@ -198,7 +198,7 @@ def orderdrinks(table_id):
           
         cur.close()
 
-        return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
+        return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id, table_id = table_id)
 
 
 #add mains
@@ -213,7 +213,7 @@ def ordermains(table_id):
         sub_categories = cur.fetchall()
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = str(order_id)
+        order_id = order_id['order_id']
         cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
@@ -221,7 +221,7 @@ def ordermains(table_id):
                 sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
         cur.close()
 
-        return render_template('ordermains.html', sub_categories = sub, order_id = order_id[14:-2], table_id = table_id)
+        return render_template('ordermains.html', sub_categories = sub, order_id = order_id, table_id = table_id)
 
 #add starters
 @app.route('/tables/<string:table_id>/orderstarters')
@@ -234,10 +234,10 @@ def orderstarters(table_id):
         print(starters)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = str(order_id)
+        order_id = order_id['order_id']
         cur.close()
 
-        return render_template('orderstarters.html', starters = starters, order_id = order_id[14:-2], table_id = table_id)
+        return render_template('orderstarters.html', starters = starters, order_id = order_id, table_id = table_id)
 
 #add sides
 @app.route('/tables/<string:table_id>/ordersides')
@@ -250,10 +250,10 @@ def ordersides(table_id):
         print(sides)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = str(order_id)
+        order_id = order_id['order_id']
         cur.close()
 
-        return render_template('ordersides.html', sides = sides, order_id = order_id[14:-2], table_id = table_id)
+        return render_template('ordersides.html', sides = sides, order_id = order_id, table_id = table_id)
 
 #add desserts
 @app.route('/tables/<string:table_id>/orderdesserts')
@@ -266,10 +266,10 @@ def orderdesserts(table_id):
         print(desserts)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = str(order_id)
+        order_id = order_id['order_id']
         cur.close()
 
-        return render_template('orderdesserts.html', desserts = desserts, order_id = order_id[14:-2], table_id = table_id)
+        return render_template('orderdesserts.html', desserts = desserts, order_id = order_id, table_id = table_id)
 
 #add to order
 @app.route('/tables/<string:id>/add_to_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])

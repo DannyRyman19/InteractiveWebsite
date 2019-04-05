@@ -84,6 +84,25 @@ def individual_bill_history(order_id):
         
         return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, total = total, order_id = order_id)
 
+#Daily Summary
+@app.route('/daily_summary')
+@is_logged_in
+@is_manager
+def daily_summary():
+        from datetime import datetime
+        date = datetime.today().strftime('%Y-%m-%d')
+        displayDate = datetime.today().strftime('%d-%m-%y')
+        cur = mysql.connection.cursor()
+        cur.execute(("SELECT COUNT(*) FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
+        DailyTables = cur.fetchone()
+        DailyTables = DailyTables['COUNT(*)']
+        cur.execute(("SELECT sum(total) as DailyTotal FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
+        DailyTotal = cur.fetchone()
+        DailyTotal = DailyTotal['DailyTotal']
+        cur.execute(("SELECT sum(covers) as DailyCovers FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
+        DailyCovers = cur.fetchone()
+        DailyCovers = DailyCovers['DailyCovers']
+        return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables, displayDate = displayDate)
 
 
 #tables

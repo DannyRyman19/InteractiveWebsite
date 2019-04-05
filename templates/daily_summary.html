@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <h1>Daily Summary</h1><h2>{{displayDate}}</h2>
+    <h3 class="float-right"><small>Welcome {{session.name}}</small></h3>
+    <hr>
+    <script>
+            $(document).ready( function () {
+          $('#example').DataTable();
+      } );
+          </script>
+    <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        
+        <thead>
+            <tr>
+                <th>Total Customers Served</th>
+                <th>Total Tables Closed</th>
+                <th>Total Takings</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Total Customers Served</th>
+                <th>Total Tables Closed</th>
+                <th>Total Takings</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <tr>
+                <td>{{DailyCovers}}</td>
+                <td>{{DailyTables}}</td>
+                <td>£{{DailyTotal}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+      
+           
+           
+
+
+  
+
+
+{% endblock %}

@@ -101,11 +101,7 @@
                 <tbody>
                         {% for starter in starters %}
                     <tr id="starter{{starter.product_id}}">
-                    <script>
-                        $("#starter{{starter.product_id}}").click(function(){
-                         window.location = "edit_product/{{starter.product_id}}";
-                    })
-                    </script>
+                    
                         <td>{{starter.product_id}}</td>
                         <td>{{starter.name}}</td>
                         <td>{{starter.price}}</td>

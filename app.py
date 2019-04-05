@@ -102,10 +102,10 @@ def tables(id):
         print(drinks)
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name, order_item.message;").format(order_id, id))
         starters = cur1.fetchall()
-
         cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name, order_item.message;").format(order_id, id))
         mains = cur1.fetchall()
-
+        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 4 GROUP BY product.name, order_item.message;").format(order_id, id))
+        sides = cur1.fetchall()
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
         total = total['total']
@@ -130,7 +130,7 @@ def tables(id):
 
         cur.close()
         
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, order_id = order_id)
+        return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -218,6 +218,22 @@ def orderstarters(table_id):
 
         return render_template('orderstarters.html', starters = starters, order_id = order_id[14:-2], table_id = table_id)
 
+#add sides
+@app.route('/tables/<string:table_id>/ordersides')
+@is_logged_in
+def ordersides(table_id):
+        
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 4 and category.category_id = 4;")
+        sides= cur.fetchall()
+        print(sides)
+        cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
+        order_id = cur.fetchone()
+        order_id = str(order_id)
+        cur.close()
+
+        return render_template('ordersides.html', sides = sides, order_id = order_id[14:-2], table_id = table_id)
+
 #add to order
 @app.route('/tables/<string:id>/add_to_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
 @is_logged_in
@@ -288,7 +304,7 @@ class productForm(Form):
         price = DecimalField('price')
         category_id = SelectField('Category', choices = [('1','Drinks'),('2','Starters'),('3','Mains'),('4','Sides'),('5', 'Desserts'),('6','Others')])
         stock = IntegerField('Stock Count')
-        subcategory_id = SelectField('Sub Category', choices=[('1','Soft'),('2','Hot'),('3','White Wine'),('4','Red Wine'),('5','Sparkling/Fizzy'),('6','Beer'),('7','Cocktail'),('8','Drink Other'), ('9','Pizza'), ('10','Pasta'),('11','Grill'), ('12','Salad'),('13','Risotto'),('14','Starter Other'),('15','Main Other'),('16','Side Other'), ('17','Dessert Other')])  
+        subcategory_id = SelectField('Sub Category', choices=[('1','Soft'),('2','Hot'),('3','White Wine'),('4','Red Wine'),('5','Rosè/Sparkling/Fizzy'),('6','Beer'),('7','Cocktail'),('8','Drink Other'), ('9','Pizza'), ('10','Pasta'),('11','Grill'), ('12','Salad'),('13','Risotto'),('14','Starter Other'),('15','Main Other'),('16','Side Other'), ('17','Dessert Other')])  
 
 
 #Product addition  to databse      

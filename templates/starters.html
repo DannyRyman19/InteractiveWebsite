@@ -4,11 +4,12 @@
 <h1>Starters</h1>
 <hr>    
 <table class="table table-striped">
-        {% for starter in starters %}
         <tr><th>Name</th>
             <th>Price</th>
             <th>Description</th></tr>
            <tr>
+        {% for starter in starters %}
+
                 <td>
                     {{starter.name}}   
                 </td>

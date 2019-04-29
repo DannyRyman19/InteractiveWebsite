@@ -22,7 +22,7 @@ def is_logged_in(f):
                 if 'logged_in' in session:
                         return f(*args, **kwargs)
                 else:
-                        flash("You must be logged in to access this page", 'danger')
+                        flash("You must be logged in to access this ßpage", 'danger')
                         return redirect(url_for('login'))
         return wrap
 #manager check - checks if the logged in user is a manager, managers can access stock management and user management.
@@ -301,7 +301,11 @@ def add_to_order(id, order_id, product_id, price):
                 
         else:
                 flash("Please add a valid quantity.", 'danger')
-        return redirect(url_for('tables', id = id, _external = True))
+        tables(id)
+        return redirect(url_for('tables', id = id))
+
+
+        
 
 
 
@@ -532,7 +536,7 @@ class EditForm(Form):
         name = StringField('Name', [validators.Length(min=1)])
         username = StringField('Username', [validators.Length(min=4,max=25)])
         email = StringField('Email', [validators.Length(min =6, max = 50)])
-        authority = SelectField('Authority', choices=[('1','General Manager'),('2','Assistant Manager'),('3','Supervisor'),('4','Waiter')])
+        authority = SelectField('Authority', choices=[('1','General Manager'),('2','Assistant Manager'),('3','Supervisor'),('4','Chef'),('5','Waiter')])
 
 
 
@@ -543,7 +547,7 @@ class RegisterForm(Form):
         name = StringField('Name', [validators.Length(min=1)])
         username = StringField('Username', [validators.Length(min=4,max=25)])
         email = StringField('Email', [validators.Length(min =6, max = 50)])
-        authority = SelectField('Authority', choices=[('1','General Manager'),('2','Assistant Manager'),('3','Supervisor'),('4','Waiter')])
+        authority = SelectField('Authority', choices=[('1','General Manager'),('2','Assistant Manager'),('3','Supervisor'),('4','Chef'),('5','Waiter')])
         password = PasswordField('Password', [
                 validators.DataRequired(),
                 validators.EqualTo('confirm', message = "Passwords do not match")
@@ -586,6 +590,8 @@ def login():
                                 session['manager'] = True
                         elif auth == "{'authority': 3":
                                 auth = "Supervisor"
+                        elif auth == "{'authority': 4":
+                                auth = "Chef"
                         else:
                                 auth = "Waiter"
                         if sha256_crypt.verify(password_candidate, password): #checks if passwords match

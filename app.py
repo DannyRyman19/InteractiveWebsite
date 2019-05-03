@@ -36,6 +36,18 @@ def is_manager(f):
                         return redirect(url_for('floor'))
         return wrap
 
+def is_chef(f):
+        @wraps(f)
+        def wrap(*args, **kwargs):
+                if 'chef' in session:
+                        return f(*args, **kwargs)
+                elif 'manager' in session:
+                        return f(*args, **kwargs)
+                else:
+                        flash("You must be a manager/chef to access this page", 'danger')
+                        return redirect(url_for('floor'))
+        return wrap
+
 mysql= MySQL(app)
 @app.route('/restaurant_floor')
 def floor():
@@ -355,7 +367,8 @@ class productForm(Form):
 #Product addition  to databse      
 @app.route('/add_product', methods = ["GET", "POST"])
 @is_logged_in
-@is_manager                             
+@is_manager      
+@is_chef                       
 def add_product():
       
         form = productForm(request.form)
@@ -390,6 +403,7 @@ def add_product():
 @app.route('/edit_product/<int:product_id>', methods = ["GET", "POST"])
 @is_logged_in
 @is_manager
+@is_chef
 def edit_product(product_id):
 
         cur = mysql.connection.cursor()
@@ -432,6 +446,7 @@ def edit_product(product_id):
 @app.route('/delete_product/<int:id>', methods = ["POST"])
 @is_logged_in
 @is_manager
+@is_chef
 def delete_product(id):
         cur = mysql.connection.cursor()
 
@@ -574,24 +589,23 @@ def login():
                         cur.execute("SELECT id FROM users WHERE username = %s", [username]) 
                         userID = cur.fetchone() 
                         cur.execute("SELECT name FROM users WHERE username = %s", [username]) 
-                        name = cur.fetchone() 
-                        name = str(name)
-                        name = name[10:-2]                              
+                        name = cur.fetchone()
+                        name = name['name']                              
                         password = data['password']
-                        auth = str(auth)
-                        userID = str(userID)
-                        userID = userID[6:-1]
-                        userID = int(userID)
-                        if auth == "{'authority': 1}":
+                        auth = auth['authority']
+                        userID = userID['id']
+                        if auth == 1:
                                 auth = "General Manager"
                                 session['manager'] = True
-                        elif auth == "{'authority': 2}":
+                        elif auth == 2:
                                 auth = "Assistant Manager"
                                 session['manager'] = True
-                        elif auth == "{'authority': 3":
+                        elif auth == 3:
                                 auth = "Supervisor"
-                        elif auth == "{'authority': 4":
+                        elif auth == 4:
                                 auth = "Chef"
+                                session['chef'] = True
+                                print(session['chef'])
                         else:
                                 auth = "Waiter"
                         if sha256_crypt.verify(password_candidate, password): #checks if passwords match
@@ -602,8 +616,10 @@ def login():
                                 session['name'] = name
                                 session['id'] = userID
                                 flash('You are now logged in', 'success')
-                                if auth != "Waiter":
+                                if "manager" in session:
                                         return redirect(url_for('dashboard'))
+                                elif "chef" in session:
+                                        return redirect(url_for('kitchen'))
                                 else:
                                         return redirect(url_for('floor')) #logs user in to dashboard
                         else: #passswords don't match
@@ -630,7 +646,7 @@ def logout():
 #stock management
 @app.route('/stock_management')
 @is_logged_in
-@is_manager
+@is_chef
 def stock_management():
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 1 and category.category_id = 1;")
@@ -723,7 +739,7 @@ def edit_user(id):
 
         cur = mysql.connection.cursor()
         
-        result = cur.execute("SELECT * FROM users WHERE id = %s", [id])
+        cur.execute("SELECT * FROM users WHERE id = %s", [id])
 
         user = cur.fetchone()
 

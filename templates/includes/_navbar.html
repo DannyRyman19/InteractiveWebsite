@@ -38,6 +38,22 @@
               <a class="nav-link" href="/restaurant_floor">Floor<span class="sr-only"></span></a>
              </li>  
              <li class="nav-item">
+                <a class="nav-link" href="/kitchen">Kitchen<span class="sr-only"></span></a>
+             </li> 
+             <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout<span class="sr-only"></span></a>
+             </li>  
+            {% elif session.chef %}
+              <li class="nav-item">
+                <a class="nav-link" href="/restaurant_floor">Floor<span class="sr-only"></span></a>
+               </li>  
+             <li class="nav-item">
+                <a class="nav-link" href="/stock_management">Stock Management<span class="sr-only"></span></a>
+             </li> 
+             <li class="nav-item">
+                <a class="nav-link" href="/kitchen">Kitchen<span class="sr-only"></span></a>
+             </li> 
+             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout<span class="sr-only"></span></a>
              </li>  
           {% else %}          

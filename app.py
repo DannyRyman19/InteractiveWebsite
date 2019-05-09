@@ -53,6 +53,11 @@ mysql= MySQL(app)
 def floor():
         return render_template('restaurant_floor.html')
 
+
+@app.route('/kitchen')
+def kitchen():
+        return render_template('kitchen.html')
+#SELECT * FROM restaurant.order_item WHERE  LIKE '%2019-05-03%' and table_id = 1;
 #Bill History
 @app.route('/bill_history')
 @is_logged_in
@@ -358,10 +363,10 @@ def index():
 class productForm(Form):
         name = TextAreaField('Name', [validators.Length(min=1, max=200)])
         description = TextAreaField('Description', [validators.Length(min=0,max=200)])
-        price = DecimalField('price')
+        price = DecimalField('Price')
         category_id = SelectField('Category', choices = [('1','Drinks'),('2','Starters'),('3','Mains'),('4','Sides'),('5', 'Desserts'),('6','Others')])
         stock = IntegerField('Stock Count')
-        subcategory_id = SelectField('Sub Category', choices=[('1','Soft'),('2','Hot'),('3','White Wine'),('4','Red Wine'),('5','Rosè/Sparkling/Fizzy'),('6','Beer'),('7','Cocktail'),('8','Drink Other'), ('9','Pizza'), ('10','Pasta'),('11','Grill'), ('12','Salad'),('13','Risotto'),('14','Starter Other'),('15','Main Other'),('16','Side Other'), ('17','Dessert Other')])  
+        subcategory_id = SelectField('Sub Category', choices=[('0','Please select a sub category'),('1','Soft'),('2','Hot'),('3','White Wine'),('4','Red Wine'),('5','Rosè/Sparkling/Fizzy'),('6','Beer'),('7','Cocktail'),('8','Drink Other'), ('9','Pizza'), ('10','Pasta'),('11','Grill'), ('12','Salad'),('13','Risotto'),('14','Starter Other'),('15','Main Other'),('16','Side Other'), ('17','Dessert Other')])  
 
 
 #Product addition  to databse      

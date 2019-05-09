@@ -51,6 +51,13 @@
                   $('#Desserts').DataTable();
               } );
             </script>
+            <script>
+            $(document).ready(function(){
+            $('table tr td').on('click', function(){
+            $('input[type="text"]',this).css('display','block');
+            });    
+            });
+            </script>
     {% else %}
         <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
         <hr>    
@@ -150,6 +157,7 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -158,18 +166,28 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
+
                 </tfoot>
                 <tbody>
                         {% for drink in drinks %}
                     
                     <tr>
-                            <td><input type="number" style="width:45px" value = "{{drink.quantity}}"></td>
+                            <td><p class="{{drink.product_id}}quantity" >{{drink.quantity}}</p></td>
                             <td>{{drink.name}}</td>
-                            <td>{{drink.message}}</td>
+                            <td class="{{drink.product_id}}message">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
+                            <td><button onclick="myFunction()">Edit</button></td>
+
                         </tr>
-                        
+                        <script>
+                            function myFunction() {
+                                  document.getElementById("{{drink.product_id}}message").contentEditable = true;
+                                  document.getElementById("{{drink.product_id}}quantity").contentEditable = true;
+                                
+                            }
+                        </script>
                         {% endfor %}
 
                         {% for starter in starters %}
@@ -232,6 +250,7 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -240,17 +259,47 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
+
                 </tfoot>
                 <tbody>
                         {% for drink in drinks %}
                     
                     <tr>
-                            <td><input type="number" style="width:45px" value = "{{drink.quantity}}"></td>
+                        
+                            <td><p id="{{drink.product_id}}quantity" >{{drink.quantity}}</p></td>
                             <td>{{drink.name}}</td>
-                            <td>{{drink.message}}</td>
+                            <td id="{{drink.product_id}}message">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
+                            <td><button id="{{drink.product_id}}edit" onclick="editFunction()">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction()">Save</button></td>
+
+
                         </tr>
+                        <script>
+                            function editFunction() {
+                                  document.getElementById("{{drink.product_id}}message").contentEditable = true;
+                                  document.getElementById("{{drink.product_id}}message").style.color = "red" ;
+
+                                  document.getElementById("{{drink.product_id}}quantity").contentEditable = true;
+                                  document.getElementById("{{drink.product_id}}quantity").style.color = "red" ;
+                                  document.getElementById("{{drink.product_id}}edit").style.display = "none";  
+                                  document.getElementById("{{drink.product_id}}save").style.display = "block";  
+
+                            }
+                        </script>
+                        <script>
+                                function saveFunction() {
+                                      document.getElementById("{{drink.product_id}}message").contentEditable = false;
+                                      document.getElementById("{{drink.product_id}}message").style.color = "black" ;
+    
+                                      document.getElementById("{{drink.product_id}}quantity").contentEditable = false;
+                                      document.getElementById("{{drink.product_id}}quantity").style.color = "black" ;
+                                      document.getElementById("{{drink.product_id}}save").style.display = "none"; 
+                                      document.getElementById("{{drink.product_id}}edit").style.display = "block"; 
+                                }
+                            </script>
+                    
                         
                         {% endfor %}
                     

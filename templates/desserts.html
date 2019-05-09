@@ -4,10 +4,11 @@
 <h1>Desserts</h1>
 <hr>    
 <table class="table table-striped">
-        {% for dessert in desserts %}
+        
         <tr><th>Name</th>
             <th>Price</th>
             <th>Description</th></tr>
+            {% for dessert in desserts %}
            <tr>
                 <td>
                     {{dessert.name}}   

@@ -4,10 +4,11 @@
 <h1>Sides</h1>
 <hr>    
 <table class="table table-striped">
-        {% for side in sides %}
+        
         <tr><th>Name</th>
             <th>Price</th>
             <th>Description</th></tr>
+            {% for side in sides %}
            <tr>
                 <td>
                     {{side.name}}   

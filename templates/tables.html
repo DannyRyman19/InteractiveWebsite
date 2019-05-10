@@ -1,7 +1,34 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+<script>
+    function editFunction(product_id) {
+          var message = ''+product_id+'message';
+          var quantity = ''+product_id+'quantity';
 
+          document.getElementById(message).contentEditable = true;
+          document.getElementById(message).style.color = "red" ;
+
+          document.getElementById(quantity).contentEditable = true;
+          document.getElementById(quantity).style.color = "red" ;
+          document.getElementById(product_id+"edit").style.display = "none";  
+          document.getElementById(product_id+"save").style.display = "block";  
+
+    }
+</script>
+<script>
+        function saveFunction(product_id) {
+              var message = ''+product_id+'message';
+              var quantity = ''+product_id+'quantity';
+              document.getElementById(message).contentEditable = false;
+              document.getElementById(message).style.color = "black" ;
+
+              document.getElementById(quantity).contentEditable = false;
+              document.getElementById(quantity).style.color = "black" ;
+              document.getElementById(product_id+"save").style.display = "none"; 
+              document.getElementById(product_id+"edit").style.display = "block"; 
+        }
+    </script>
     {% if tables.active ==  1 %}
         <h1>Table Number {{id}}<div class="float-right">Seats:<input id="covers" type ="text" style="width: 45px" value="{{tables.covers}}"></div></h1>
         {{order_id}}
@@ -157,7 +184,6 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -166,7 +192,6 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
 
                 </tfoot>
                 <tbody>
@@ -178,22 +203,15 @@
                             <td class="{{drink.product_id}}message">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
-                            <td><button onclick="myFunction()">Edit</button></td>
 
                         </tr>
-                        <script>
-                            function myFunction() {
-                                  document.getElementById("{{drink.product_id}}message").contentEditable = true;
-                                  document.getElementById("{{drink.product_id}}quantity").contentEditable = true;
-                                
-                            }
-                        </script>
+                        
                         {% endfor %}
 
                         {% for starter in starters %}
                     
                     <tr>
-                            <td><input type="number" style="width:45px" value = "{{starter.quantity}}"></td>
+                            <td>{{starter.quantity}}</td>
                             <td>{{starter.name}}</td>
                             <td>{{starter.message}}</td>
                             <td>{{starter.price}}</td>
@@ -205,7 +223,7 @@
                         {% for main in mains %}
                     
                     <tr>
-                            <td><input type="number" style="width:45px" value = "{{main.quantity}}"></td>
+                            <td>{{main.quantity}}</td>
                             <td>{{main.name}}</td>
                             <td>{{main.message}}</td>
                             <td>{{main.price}}</td>
@@ -217,7 +235,7 @@
                         {% for side in sides %}
                     
                     <tr>
-                            <td><input type="number" style="width:45px" value = "{{side.quantity}}"></td>                            
+                            <td>{{side.quantity}}</td>                            
                             <td>{{side.name}}</td>
                             <td>{{side.message}}</td>
                             <td>{{side.price}}</td>
@@ -229,7 +247,7 @@
                         {% for dessert in desserts %}
                     
                         <tr>
-                            <td><input type="number" style="width:45px" value = "{{dessert.quantity}}"></td>
+                            <td>{{dessert.quantity}}</td>
                             <td>{{dessert.name}}</td>
                             <td>{{dessert.message}}</td>
                             <td>{{dessert.price}}</td>
@@ -267,38 +285,14 @@
                     
                     <tr>
                         
-                            <td><p id="{{drink.product_id}}quantity" >{{drink.quantity}}</p></td>
+                            <td id="{{drink.product_id}}quantity">{{drink.quantity}}</td>
                             <td>{{drink.name}}</td>
                             <td id="{{drink.product_id}}message">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
-                            <td><button id="{{drink.product_id}}edit" onclick="editFunction()">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction()">Save</button></td>
-
-
+                            <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')">Save</button></td>
                         </tr>
-                        <script>
-                            function editFunction() {
-                                  document.getElementById("{{drink.product_id}}message").contentEditable = true;
-                                  document.getElementById("{{drink.product_id}}message").style.color = "red" ;
-
-                                  document.getElementById("{{drink.product_id}}quantity").contentEditable = true;
-                                  document.getElementById("{{drink.product_id}}quantity").style.color = "red" ;
-                                  document.getElementById("{{drink.product_id}}edit").style.display = "none";  
-                                  document.getElementById("{{drink.product_id}}save").style.display = "block";  
-
-                            }
-                        </script>
-                        <script>
-                                function saveFunction() {
-                                      document.getElementById("{{drink.product_id}}message").contentEditable = false;
-                                      document.getElementById("{{drink.product_id}}message").style.color = "black" ;
-    
-                                      document.getElementById("{{drink.product_id}}quantity").contentEditable = false;
-                                      document.getElementById("{{drink.product_id}}quantity").style.color = "black" ;
-                                      document.getElementById("{{drink.product_id}}save").style.display = "none"; 
-                                      document.getElementById("{{drink.product_id}}edit").style.display = "block"; 
-                                }
-                            </script>
+                       
                     
                         
                         {% endfor %}
@@ -316,6 +310,7 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -324,16 +319,19 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                 </tfoot>
                 <tbody>
                         {% for starter in starters %}
                     
                     <tr>
-                            <td><input type="number" style="width:45px" value = "{{starter.quantity}}"></td>
+                            <td id="{{starter.product_id}}quantity">{{starter.quantity}}</td>
                             <td>{{starter.name}}</td>
-                            <td>{{starter.message}}</td>
+                            <td id="{{starter.product_id}}message">{{starter.message}}</td>
                             <td>{{starter.price}}</td>
                             <td>{{starter.subtotal}}</td>
+                            <td><button id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')">Save</button></td>
+
                         </tr>
                         {% endfor %}
                     
@@ -350,6 +348,7 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -358,16 +357,19 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                 </tfoot>
                 <tbody>
                    
                         {% for main in mains %}
                     <tr>
-                        <td><input type="number" style="width:45px" value = "{{main.quantity}}"></td>
-                        <td>{{main.name}}</td>
-                        <td>{{main.message}}</td>
-                        <td>{{main.price}}</td>
-                        <td>{{main.subtotal}}</td>
+                            <td id="{{main.product_id}}quantity">{{main.quantity}}</td>
+                            <td>{{main.name}}</td>
+                            <td id="{{main.product_id}}message">{{main.message}}</td>
+                            <td>{{main.price}}</td>
+                            <td>{{main.subtotal}}</td>
+                            <td><button id="{{main.product_id}}edit" onclick="editFunction('{{main.product_id}}')">Edit</button><button style="display: none" id="{{main.product_id}}save" onclick="saveFunction('{{main.product_id}}')">Save</button></td>
+
                     </tr>
                     
                     {% endfor %}
@@ -387,6 +389,7 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -395,16 +398,19 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                 </tfoot>
                 <tbody>
                    
                         {% for side in sides %}
                     <tr>
-                        <td><input type="number" style="width:45px"  value = "{{side.quantity}}"></td>                                                    
+                        <td id="{{side.product_id}}quantity">{{side.quantity}}</td>                                          
                         <td>{{side.name}}</td>
-                        <td>{{side.message}}</td>
+                        <td id="{{side.product_id}}message">{{side.message}}</td>
                         <td>{{side.price}}</td>
                         <td>{{side.subtotal}}</td>
+                        <td><button id="{{side.product_id}}edit" onclick="editFunction('{{side.product_id}}')">Edit</button><button style="display: none" id="{{side.product_id}}save" onclick="saveFunction('{{side.product_id}}')">Save</button></td>
+
                     </tr>
                     
                     {% endfor %}
@@ -423,6 +429,7 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -431,16 +438,19 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
+                        <th></th>
                 </tfoot>
                 <tbody>
                    
                         {% for dessert in desserts %}
                     <tr>
-                        <td><input type="number" style="width:45px" value = "{{dessert.quantity}}"></td>                        
+                        <td id="{{dessert.product_id}}quantity">{{dessert.quantity}}</td>                        
                         <td>{{dessert.name}}</td>
-                        <td>{{dessert.message}}</td>
+                        <td id="{{dessert.product_id}}message">{{dessert.message}}</td>
                         <td>{{dessert.price}}</td>
                         <td>{{dessert.subtotal}}</td>
+                        <td><button id="{{dessert.product_id}}edit" onclick="editFunction('{{dessert.product_id}}')">Edit</button><button style="display: none" id="{{dessert.product_id}}save" onclick="saveFunction('{{dessert.product_id}}')">Save</button></td>
+
                     </tr>
                     
                     {% endfor %}

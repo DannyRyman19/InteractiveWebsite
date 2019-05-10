@@ -40,7 +40,7 @@
                     <script>
                         $('#AddButton{{side.product_id}}').on('click', function () {
                         var input = $('#quantity{{side.product_id}}');
-                        if (parseInt(input.val()) < {{side.stock}} ){
+                        if (parseInt(input.val()) < '{{side.stock}}' ){
                             input.val(parseInt(input.val()) + 1);
                         }
                     })    

@@ -127,7 +127,6 @@ def daily_summary():
 @is_logged_in
 def tables(id):
         cur = mysql.connection.cursor()
-        cur1 = mysql.connection.cursor()
         cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
         print(tables)
@@ -200,25 +199,17 @@ def opentable(id):
 @is_logged_in
 def orderdrinks(table_id):
         
-       
         cur = mysql.connection.cursor()
-
         cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
-      
-       
         sub_categories = cur.fetchall()
-
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))
         order_id = cur.fetchone()
         order_id = order_id['order_id']
-        cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
-                cur1.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
-                sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
-          
+                cur.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
+                sub.append([subcat["subcategory_name"],cur.fetchall(),subcat["subcategory_id"]])
         cur.close()
-
         return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id, table_id = table_id)
 
 
@@ -229,17 +220,15 @@ def ordermains(table_id):
         
        
         cur = mysql.connection.cursor()
-
         cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 3")
         sub_categories = cur.fetchall()
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
         order_id = order_id['order_id']
-        cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
-                cur1.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id ").format((subcat["subcategory_id"])))
-                sub.append([subcat["subcategory_name"],cur1.fetchall(),subcat["subcategory_id"]])
+                cur.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id ").format((subcat["subcategory_id"])))
+                sub.append([subcat["subcategory_name"],cur.fetchall(),subcat["subcategory_id"]])
         cur.close()
 
         return render_template('ordermains.html', sub_categories = sub, order_id = order_id, table_id = table_id)
@@ -320,11 +309,6 @@ def add_to_order(id, order_id, product_id, price):
         tables(id)
         return redirect(url_for('tables', id = id))
 
-
-        
-
-
-
 #Close table
 @app.route('/tables/closetable/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
@@ -356,9 +340,6 @@ def index():
         return render_template('home.html')
 
 #Product creation form
- 
-
-
 class productForm(Form):
         name = TextAreaField('Name', [validators.Length(min=1, max=200)])
         description = TextAreaField('Description', [validators.Length(min=0,max=200)])

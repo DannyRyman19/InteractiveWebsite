@@ -6,11 +6,6 @@
 <hr>
 
 {% for category in sub_categories %}
-<style>
-        #Table{{category[2]}}{
-            display: none;
-        }
-        </style>
 <h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
 <script>
         $("#btn{{category[2]}}").click(function(){
@@ -18,7 +13,7 @@
       
     });
 </script>
-<table id="Table{{category[2]}}" class="table table-striped">
+<table id="Table{{category[2]}}" style="display: none" class="table table-striped">
         <tr><th>Name</th>
         <th>Price</th>
         <th>Optional Message</th>
@@ -29,10 +24,6 @@
 
     </tr>
 {% for drink in category[1] %}
-
-
-
-  
             <tr>
                     <form id = "Form{{category[2]}}" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
                     <td>{{drink.name}}</td> 
@@ -53,7 +44,7 @@
                     <script>
                         $('#AddButton{{drink.product_id}}').on('click', function () {
                         var input = $('#quantity{{drink.product_id}}');
-                        if (parseInt(input.val()) < {{drink.stock}} ){
+                        if (parseInt(input.val()) < '{{drink.stock}}' ){
                             input.val(parseInt(input.val()) + 1);
                         }
                     })    

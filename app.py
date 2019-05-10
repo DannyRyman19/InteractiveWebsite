@@ -65,10 +65,8 @@ def kitchen():
 def bill_history():
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM bill_history ORDER BY date_closed DESC")
-        
         History = cur.fetchall()
         cur.close()
-       
         return render_template('bill_history.html', History = History)
 
 #Individual bill history
@@ -76,30 +74,30 @@ def bill_history():
 @is_logged_in
 def individual_bill_history(order_id):
         cur = mysql.connection.cursor()
-        cur1 = mysql.connection.cursor()
+
         cur.execute(("SELECT table_id FROM order_item WHERE order_item.order_id = '{0}';").format(order_id))
         id = cur.fetchone()
         id = id['table_id']
-        
         cur.execute(("SELECT * FROM bill_history WHERE order_id = '{0}' ORDER BY date_closed DESC").format(order_id))
         history = cur.fetchone()
         print(history)
-        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE  order_item.order_id = '{0}' AND order_item.table_id = {1} and sub_category.category_id = 1 GROUP BY product.name;").format(order_id, id))
-        drinks = cur1.fetchall()
-        
-        print(drinks)
-        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 2 GROUP BY product.name;").format(order_id, id))
-        starters = cur1.fetchall()
-
-        cur1.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = 3 GROUP BY product.name;").format(order_id, id))
-        mains = cur1.fetchall()
-
+        for i in range(1,6):
+                cur.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE  order_item.order_id = '{0}' AND order_item.table_id = {1} and sub_category.category_id = {2} GROUP BY product.name;").format(order_id, id,i))
+                if i == 1:
+                        drinks = cur.fetchall()
+                elif i == 2:
+                        starters = cur.fetchall()
+                elif i == 3:
+                        mains = cur.fetchall()
+                elif i == 4:
+                        sides = cur.fetchall()
+                else:
+                        desserts = cur.fetchall()
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
         total = total['total']
         cur.close()
-        
-        return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, total = total, order_id = order_id)
+        return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, total = total, order_id = order_id)
 
 #Daily Summary
 @app.route('/daily_summary')
@@ -121,10 +119,8 @@ def daily_summary():
         DailyCovers = DailyCovers['DailyCovers']
         cur.execute(("SELECT order_item.product_id, order_item.quantity, order_item.subtotal, product.name FROM restaurant.order_item, restaurant.product WHERE last_order_time LIKE '%{0}%' AND order_item.product_id = product.product_id;").format(date))
         DailyItems = cur.fetchall()
-        print(DailyItems)
         cur.close()
         return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables, displayDate = displayDate, DailyItems= DailyItems)
-
 
 #tables
 @app.route('/tables/<string:id>')
@@ -134,6 +130,7 @@ def tables(id):
         cur1 = mysql.connection.cursor()
         cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
+        print(tables)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(id))
         order_id = cur.fetchone()
         order_id = order_id['order_id']
@@ -299,9 +296,8 @@ def orderdesserts(table_id):
 @app.route('/tables/<string:id>/add_to_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
 @is_logged_in
 def add_to_order(id, order_id, product_id, price):
-        formrequest = "quantity" + str(product_id)
-        quantity = request.form[formrequest]
-        message = request.form.get("message" + str(product_id))  
+        quantity = request.form.get("quantity" + str(product_id))
+        message = request.form.get("message" + str(product_id))
         if int(quantity) > 0 :
                 price = float(price)
                 cur = mysql.connection.cursor()
@@ -472,25 +468,15 @@ def delete_product(id):
 #drinks
 @app.route('/drinks')
 def drinks():
-       
-        cur = mysql.connection.cursor()
-
-        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
         
-       
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
         sub_categories = cur.fetchall()
-        cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
-                cur1.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id").format((str((subcat["subcategory_id"])))))
-                sub.append([subcat["subcategory_name"],cur1.fetchall()])
-                #print(subcat["subcategory_id"])
-
-      
-
+                cur.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id").format((str((subcat["subcategory_id"])))))
+                sub.append([subcat["subcategory_name"],cur.fetchall()])
         cur.close()
-     
-        
         return render_template('drinks.html',  sub_categories = sub)
 
 
@@ -499,25 +485,17 @@ def drinks():
 def starters():
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
- 
         starters= cur.fetchall()
         cur.close()
-       
         return render_template('starters.html', starters=starters)
-       
-   
-
-
 
 # sides
 @app.route('/sides')
 def sides():
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 4 and category.category_id = 4;")
-
         sides= cur.fetchall()
         cur.close()
-       
         return render_template('sides.html', sides=sides)
 
 
@@ -525,23 +503,13 @@ def sides():
 @app.route('/mains')
 def mains():
         cur = mysql.connection.cursor()
-
         cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 3")
-        
-       
         sub_categories = cur.fetchall()
-        cur1 = mysql.connection.cursor()
         sub=[]
         for subcat in sub_categories:
-                cur1.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id").format((str((subcat["subcategory_id"])))))
-                sub.append([subcat["subcategory_name"],cur1.fetchall()])
-                #print(subcat["subcategory_id"])
-
-      
-
+                cur.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id").format((str((subcat["subcategory_id"])))))
+                sub.append([subcat["subcategory_name"],cur.fetchall()])
         cur.close()
-     
-        
         return render_template('mains.html',  sub_categories = sub)
 
 # desserts
@@ -560,10 +528,6 @@ class EditForm(Form):
         username = StringField('Username', [validators.Length(min=4,max=25)])
         email = StringField('Email', [validators.Length(min =6, max = 50)])
         authority = SelectField('Authority', choices=[('1','General Manager'),('2','Assistant Manager'),('3','Supervisor'),('4','Chef'),('5','Waiter')])
-
-
-
-
 
 #sign up form validation
 class RegisterForm(Form):
@@ -657,26 +621,18 @@ def logout():
 @is_chef
 def stock_management():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 1 and category.category_id = 1;")
-
-        drinks = cur.fetchall()
-
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
-
-        starters= cur.fetchall()
-        
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 3 and category.category_id = 3;")
-
-        mains= cur.fetchall()
-
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 4 and category.category_id = 4;")
-
-        sides= cur.fetchall()
-
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 5 and category.category_id = 5;")
-
-        desserts = cur.fetchall()
-
+        for i in range(1,6):
+                cur.execute(("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = {0} and category.category_id = {0};").format(i))
+                if i == 1:
+                        drinks = cur.fetchall()
+                elif i == 2:
+                        starters = cur.fetchall()
+                elif i == 3:
+                        mains = cur.fetchall()
+                elif i == 4:
+                        sides = cur.fetchall()
+                else:
+                        desserts = cur.fetchall()
         cur.close()
         return render_template('stock_management.html',drinks=drinks, starters=starters, mains = mains, sides=sides,desserts=desserts)
 

@@ -3,14 +3,15 @@
 {% block body %}
 <script>
     function editFunction(product_id) {
-          var message = ''+product_id+'message';
-          var quantity = ''+product_id+'quantity';
+          var message = 'message'+product_id;
+          var quantity = 'quantity'+product_id;
 
           document.getElementById(message).contentEditable = true;
           document.getElementById(message).style.color = "red" ;
 
           document.getElementById(quantity).contentEditable = true;
           document.getElementById(quantity).style.color = "red" ;
+          document.getElementById(product_id+"edit").disabled = true;
           document.getElementById(product_id+"edit").style.display = "none";  
           document.getElementById(product_id+"save").style.display = "block";  
 
@@ -18,13 +19,15 @@
 </script>
 <script>
         function saveFunction(product_id) {
-              var message = ''+product_id+'message';
-              var quantity = ''+product_id+'quantity';
+              var message = 'message'+product_id;
+              var quantity = 'quantity'+product_id;
+
               document.getElementById(message).contentEditable = false;
               document.getElementById(message).style.color = "black" ;
 
               document.getElementById(quantity).contentEditable = false;
               document.getElementById(quantity).style.color = "black" ;
+              document.getElementById(product_id+"edit").disabled = false;              
               document.getElementById(product_id+"save").style.display = "none"; 
               document.getElementById(product_id+"edit").style.display = "block"; 
         }
@@ -284,13 +287,14 @@
                         {% for drink in drinks %}
                     
                     <tr>
-                        
-                            <td id="{{drink.product_id}}quantity">{{drink.quantity}}</td>
+                            <form id = "Form{{drink.product_id}}" action = "/tables/{{tables.table_id}}/add_to_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
+                            <td id="quantity{{drink.product_id}}" name="quantity{{drink.product_id}}">{{drink.quantity}}</td>
                             <td>{{drink.name}}</td>
-                            <td id="{{drink.product_id}}message">{{drink.message}}</td>
+                            <td id="message{{drink.product_id}}" name="message{{drink.product_id}}">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
                             <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')">Save</button></td>
+                            </form>
                         </tr>
                        
                     
@@ -325,9 +329,9 @@
                         {% for starter in starters %}
                     
                     <tr>
-                            <td id="{{starter.product_id}}quantity">{{starter.quantity}}</td>
+                            <td id="quantity{{starter.product_id}}">{{starter.quantity}}</td>
                             <td>{{starter.name}}</td>
-                            <td id="{{starter.product_id}}message">{{starter.message}}</td>
+                            <td id="message{{starter.product_id}}">{{starter.message}}</td>
                             <td>{{starter.price}}</td>
                             <td>{{starter.subtotal}}</td>
                             <td><button id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')">Save</button></td>

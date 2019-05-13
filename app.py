@@ -130,9 +130,8 @@ def tables(id):
         cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
         print(tables)
-        cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(id))
-        order_id = cur.fetchone()
-        order_id = order_id['order_id']
+        order_id=tables['order_id']
+        
         for i in range(1,6):
                 cur.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, product.product_id, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = {2} GROUP BY product.name, order_item.message, product.product_id;").format(order_id, id,i))
                 if i == 1:
@@ -308,6 +307,19 @@ def add_to_order(id, order_id, product_id, price):
                 flash("Please add a valid quantity.", 'danger')
         tables(id)
         return redirect(url_for('tables', id = id))
+
+#remove from order
+@app.route('/remove_order/<int:id>/<string:order_id>/<string:table_id>', methods = ["GET","POST"])
+@is_logged_in
+def remove_order(id,order_id,table_id):
+        cur = mysql.connection.cursor()
+        cur.execute(("DELETE FROM order_item  WHERE product_id = {0} AND order_id = '{1}' AND table_id = {2};").format(id,order_id,table_id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Item Removed!', 'success')
+        tables(table_id)
+        return redirect(url_for('tables', id = table_id))
+
 
 #Close table
 @app.route('/tables/closetable/<string:id>/', methods = ["GET", "POST"])
@@ -585,9 +597,6 @@ def login():
         
         return render_template('login.html')
 
-
-
-
 #Logout
 @app.route('/logout')
 @is_logged_in
@@ -667,11 +676,8 @@ def add_user():
                 else:
                         cur = mysql.connection.cursor()
                         cur.execute("INSERT INTO users(name, email, username, authority, password) VALUES(%s, %s, %s,%s, %s)",(name, email, username, authority, password)) #adds all registration information into database
-
                         mysql.connection.commit()
-
                         cur.close()
-                
                         flash("User Added!", "success")
                         return redirect(url_for('user_management'))
         return render_template('add_user.html', form = form)

@@ -270,6 +270,7 @@
                         <th>Price</th>
                         <th>Sub Total</th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -279,7 +280,7 @@
                         <th>Price</th>
                         <th>Sub Total</th>
                         <th></th>
-
+                        <th></th>
                 </tfoot>
                 <tbody>
                         {% for drink in drinks %}
@@ -291,8 +292,13 @@
                             <td id="message{{drink.product_id}}" name="message{{drink.product_id}}">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
-                            <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')">Save</button></td>
+                            <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" oncli ck="saveFunction('{{drink.product_id}}')">Save</button></td>
                             </form>
+                            <td>
+                                    <form action="{{url_for('remove_order',id=drink.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{drink.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                    </form>
+                            </td>
                         </tr>
                        
                     
@@ -459,4 +465,32 @@
                     
                 </tbody>   
     </table>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+        
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+                <h3>Remove from table</h3>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you want to remove this product from the table?</p>
+            </div>
+            <div class="modal-footer">
+                    <form id="deleteForm" action="" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="submit" value="Delete" class="btn btn-danger">
+                            <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
+        
+                    </form>
+                    
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
 {% endblock %}

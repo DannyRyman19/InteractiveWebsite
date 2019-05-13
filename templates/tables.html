@@ -271,8 +271,8 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -281,8 +281,8 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                 </tfoot>
                 <tbody>
                         {% for drink in drinks %}
@@ -301,7 +301,7 @@
                                             <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{drink.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
                                     </form>
                             </td>
-                        </tr>
+                    </tr>
                        
                     
                         
@@ -320,7 +320,8 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -329,19 +330,27 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
+
                 </tfoot>
                 <tbody>
                         {% for starter in starters %}
                     
-                    <tr>
-                            <td id="quantity{{starter.product_id}}">{{starter.quantity}}</td>
+                        <tr>
+                            <form id = "Form{{starter.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{starter.product_id}}/{{starter.price}}/" method = "POST">
+                            <td><input type="number" id="quantity{{starter.product_id}}" name="quantity{{starter.product_id}}" value="{{starter.quantity}}" disabled="true"></td>
                             <td>{{starter.name}}</td>
-                            <td id="message{{starter.product_id}}">{{starter.message}}</td>
+                            <td><textarea id="message{{starter.product_id}}" name="message{{starter.product_id}}" disabled="true">{{starter.message}}</textarea></textarea></td>
                             <td>{{starter.price}}</td>
                             <td>{{starter.subtotal}}</td>
-                            <td><button id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')">Save</button></td>
-
+                            <td><button class="btn btn-success" id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')" type="submit">Save</button></td>
+                            </form>
+                            <td>
+                                    <form action="{{url_for('remove_order',id=starter.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{starter.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                    </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     
@@ -358,7 +367,8 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -367,20 +377,27 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                 </tfoot>
                 <tbody>
                    
                         {% for main in mains %}
-                    <tr>
-                            <td id="{{main.product_id}}quantity">{{main.quantity}}</td>
+                        <tr>
+                            <form id = "Form{{main.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
+                            <td><input type="number" id="quantity{{main.product_id}}" name="quantity{{main.product_id}}" value="{{main.quantity}}" disabled="true"></td>
                             <td>{{main.name}}</td>
-                            <td id="{{main.product_id}}message">{{main.message}}</td>
+                            <td><textarea id="message{{main.product_id}}" name="message{{main.product_id}}" disabled="true">{{main.message}}</textarea></textarea></td>
                             <td>{{main.price}}</td>
                             <td>{{main.subtotal}}</td>
-                            <td><button id="{{main.product_id}}edit" onclick="editFunction('{{main.product_id}}')">Edit</button><button style="display: none" id="{{main.product_id}}save" onclick="saveFunction('{{main.product_id}}')">Save</button></td>
-
-                    </tr>
+                            <td><button class="btn btn-success" id="{{main.product_id}}edit" onclick="editFunction('{{main.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{main.product_id}}save" onclick="saveFunction('{{main.product_id}}')" type="submit">Save</button></td>
+                            </form>
+                            <td>
+                                    <form action="{{url_for('remove_order',id=main.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{main.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                    </form>
+                            </td>
+                        </tr>
                     
                     {% endfor %}
                     
@@ -399,7 +416,8 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -408,20 +426,27 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                 </tfoot>
                 <tbody>
                    
                         {% for side in sides %}
-                    <tr>
-                        <td id="{{side.product_id}}quantity">{{side.quantity}}</td>                                          
-                        <td>{{side.name}}</td>
-                        <td id="{{side.product_id}}message">{{side.message}}</td>
-                        <td>{{side.price}}</td>
-                        <td>{{side.subtotal}}</td>
-                        <td><button id="{{side.product_id}}edit" onclick="editFunction('{{side.product_id}}')">Edit</button><button style="display: none" id="{{side.product_id}}save" onclick="saveFunction('{{side.product_id}}')">Save</button></td>
-
-                    </tr>
+                        <tr>
+                            <form id = "Form{{side.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{side.product_id}}/{{side.price}}/" method = "POST">
+                            <td><input type="number" id="quantity{{side.product_id}}" name="quantity{{side.product_id}}" value="{{side.quantity}}" disabled="true"></td>
+                            <td>{{side.name}}</td>
+                            <td><textarea id="message{{side.product_id}}" name="message{{side.product_id}}" disabled="true">{{side.message}}</textarea></textarea></td>
+                            <td>{{side.price}}</td>
+                            <td>{{side.subtotal}}</td>
+                            <td><button class="btn btn-success" id="{{side.product_id}}edit" onclick="editFunction('{{side.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{side.product_id}}save" onclick="saveFunction('{{side.product_id}}')" type="submit">Save</button></td>
+                            </form>
+                            <td>
+                                    <form action="{{url_for('remove_order',id=side.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{side.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                    </form>
+                            </td>
+                        </tr>
                     
                     {% endfor %}
                     
@@ -439,7 +464,8 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -448,20 +474,27 @@
                         <th>Message</th>
                         <th>Price</th>
                         <th>Sub Total</th>
-                        <th></th>
+                        <th>Edit Order</th>
+                        <th>Remove from Order</th>
                 </tfoot>
                 <tbody>
                    
                         {% for dessert in desserts %}
-                    <tr>
-                        <td id="{{dessert.product_id}}quantity">{{dessert.quantity}}</td>                        
-                        <td>{{dessert.name}}</td>
-                        <td id="{{dessert.product_id}}message">{{dessert.message}}</td>
-                        <td>{{dessert.price}}</td>
-                        <td>{{dessert.subtotal}}</td>
-                        <td><button id="{{dessert.product_id}}edit" onclick="editFunction('{{dessert.product_id}}')">Edit</button><button style="display: none" id="{{dessert.product_id}}save" onclick="saveFunction('{{dessert.product_id}}')">Save</button></td>
-
-                    </tr>
+                        <tr>
+                            <form id = "Form{{dessert.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{dessert.product_id}}/{{dessert.price}}/" method = "POST">
+                            <td><input type="number" id="quantity{{dessert.product_id}}" name="quantity{{dessert.product_id}}" value="{{dessert.quantity}}" disabled="true"></td>
+                            <td>{{dessert.name}}</td>
+                            <td><textarea id="message{{dessert.product_id}}" name="message{{dessert.product_id}}" disabled="true">{{dessert.message}}</textarea></textarea></td>
+                            <td>{{dessert.price}}</td>
+                            <td>{{dessert.subtotal}}</td>
+                            <td><button class="btn btn-success" id="{{dessert.product_id}}edit" onclick="editFunction('{{dessert.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{dessert.product_id}}save" onclick="saveFunction('{{dessert.product_id}}')" type="submit">Save</button></td>
+                            </form>
+                            <td>
+                                    <form action="{{url_for('remove_order',id=dessert.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{dessert.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                    </form>
+                            </td>
+                        </tr>
                     
                     {% endfor %}
                     

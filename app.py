@@ -335,10 +335,7 @@ def update_order(id, order_id, product_id, price):
                 else:
                         cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
         
-                if currentquantity > quantity:
-                        cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id))
-                else:
-                        cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id))
+                cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id))
 
                 mysql.connection.commit()
                 cur.close()

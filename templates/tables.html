@@ -5,12 +5,14 @@
     function editFunction(product_id) {
           var message = 'message'+product_id;
           var quantity = 'quantity'+product_id;
-
+          
           document.getElementById(message).contentEditable = true;
-          document.getElementById(message).style.color = "red" ;
+          document.getElementById(message).disabled = false;
+          document.getElementById(message).style.color = "blue" ;
 
           document.getElementById(quantity).contentEditable = true;
-          document.getElementById(quantity).style.color = "red" ;
+          document.getElementById(quantity).disabled = false;
+          document.getElementById(quantity).style.color = "blue" ;
           document.getElementById(product_id+"edit").disabled = true;
           document.getElementById(product_id+"edit").style.display = "none";  
           document.getElementById(product_id+"save").style.display = "block";  
@@ -286,13 +288,13 @@
                         {% for drink in drinks %}
                     
                     <tr>
-                            <form id = "Form{{drink.product_id}}" action = "/tables/{{tables.table_id}}/add_to_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
-                            <td id="quantity{{drink.product_id}}" name="quantity{{drink.product_id}}">{{drink.quantity}}</td>
+                            <form id = "Form{{drink.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
+                            <td><input type="number" id="quantity{{drink.product_id}}" name="quantity{{drink.product_id}}" value="{{drink.quantity}}" disabled="true"></td>
                             <td>{{drink.name}}</td>
-                            <td id="message{{drink.product_id}}" name="message{{drink.product_id}}">{{drink.message}}</td>
+                            <td><textarea id="message{{drink.product_id}}" name="message{{drink.product_id}}" disabled="true">{{drink.message}}</textarea></textarea></td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
-                            <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
+                            <td><button class="btn btn-success" id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=drink.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">

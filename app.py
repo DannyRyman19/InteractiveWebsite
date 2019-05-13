@@ -322,8 +322,7 @@ def update_order(id, order_id, product_id, price):
         currentquantity = cur.fetchone()
         currentquantity = currentquantity['quantity']
         #print(("Current Quantity:{0}").format(currentquantity))
-       
-                
+
         if quantity > 0 :
                 price = float(price)
                 cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))

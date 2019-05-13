@@ -36,18 +36,37 @@
         <h1>Table Number {{id}}<div class="float-right">Seats:<input id="covers" type ="text" style="width: 45px" value="{{tables.covers}}"></div></h1>
         {{order_id}}
         <hr>
-        <a class="btn btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
-            <a class="btn btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
-            <a class="btn btn-success" href="/tables/{{id}}/ordermains">Mains</a>
-            <a class="btn btn-success" href="/tables/{{id}}/ordersides">Sides</a>
-            <a class="btn btn-success" href="./{{id}}/orderdesserts">Desserts</a>
-            {% if tables.covers >= 7 %}
-                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill + 10% Service: £{{tables.totalservice}}</h2><h3>Total Bill £{{tables.total}}</h3></div>
-            {% else %}
-                <div><a class="btn btn-danger float-right" href="/tables/closetable/{{id}}/">Close Table</a><h2>Total Bill £{{tables.total}}</h2></div>
-            {% endif %}
-            <input type="button" class="btn btn-primary float-right" onclick="printDiv('printableArea')" value="Print Bill">
-            <br>
+        <div class ="container">
+            <div class="row">
+                <div class="col-sm-7">
+                    <a class="btn btn-block btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
+                    <a class="btn btn-block btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
+                    <a class="btn btn-block btn-success" href="/tables/{{id}}/ordermains">Mains</a>
+                    <a class="btn btn-block btn-success" href="/tables/{{id}}/ordersides">Sides</a>
+                    <a class="btn btn-block btn-success" href="./{{id}}/orderdesserts">Desserts</a>
+                </div>
+                
+                <div class="col-sm-5">
+                    <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#myModal">Table Options</button>
+                    <a class="btn btn-block btn-danger" href="/tables/closetable/{{id}}/">Close Table</a>
+                    <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')" value="Print Bill">
+                    {% if tables.covers >= 7 %}
+                    <br>
+                    <h4 class="float-right">Total Bill £{{tables.total}}</h4>
+                    <br>
+                    <h2 class="float-right">Bill + 10% Service: £{{tables.totalservice}}</h2>
+                    {% else %}
+                    <br>
+                    <br>
+                    <h2 class="float-right">Total Bill £{{tables.total}}</h2>
+                    {% endif %}         
+                </div> 
+            </div>
+            
+           
+                    
+
+               
             <hr>
 
             <script>

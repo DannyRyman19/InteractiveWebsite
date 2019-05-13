@@ -292,7 +292,7 @@
                             <td id="message{{drink.product_id}}" name="message{{drink.product_id}}">{{drink.message}}</td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
-                            <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" oncli ck="saveFunction('{{drink.product_id}}')">Save</button></td>
+                            <td><button id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=drink.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">

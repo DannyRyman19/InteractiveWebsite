@@ -149,6 +149,9 @@ def tables(id):
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
         total = total['total']
+        if str(total) == 'None':
+                total = 0.00
+        print (total)
         covers = tables['covers']
         service = 0.00
         totalservice = 0.00

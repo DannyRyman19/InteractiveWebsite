@@ -351,6 +351,7 @@ def remove_order(id,order_id,table_id):
         tables(table_id)
         flash('Item Removed!', 'success')
         return redirect(url_for('tables', id = table_id))
+        
 #Editing Covers
 @app.route('/tables/covers/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in

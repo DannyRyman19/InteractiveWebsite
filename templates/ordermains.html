@@ -6,7 +6,6 @@
 <hr>
 
 {% for category in sub_categories %}
-
 <h3 id="btn{{category[2]}}"><a>{{category[0]}}</a><button class="float-right">...</button></h3>
 <script>
         $("#btn{{category[2]}}").click(function(){
@@ -14,64 +13,79 @@
       
     });
 </script>
-<table id="Table{{category[2]}}" style="display:none" class="table table-striped">
-        <tr><th>Name</th>
-        <th>Price</th>
-        <th>Optional Message</th>
-        <th>Stock</th>
-        <th>Quantity</th>
-        
-        <th></th>
-
-    </tr>
-{% for main in category[1] %}
-            <tr>
-                    <form id = "Form{{category[2]}}" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
-                    <td>{{main.name}}</td> 
-                    <td>£{{main.price}}</td>
-                    <td><textarea style="width: 100px;" name = "message{{main.product_id}}" id="message{{main.product_id}}"></textarea></td>
-                    <td>{{main.stock}}</td>
-                    <td><input type="button" id ='SubButton{{main.product_id}}' value = "-">
-                    <input type="number" min= "0" name="quantity{{main.product_id}}" style="width: 30px;" id="quantity{{main.product_id}}" value =0>
-                    <input type="button" id ='AddButton{{main.product_id}}' value = "+">
-                    <script>
-                    $('#SubButton{{main.product_id}}').on('click', function () {
-                    var input = $('#quantity{{main.product_id}}');
-                    if (parseInt(input.val()) != 0){
-                        input.val(parseInt(input.val()) - 1);
-                        }
-                    })               
-                    </script>
-                    <script>
-                        $('#AddButton{{main.product_id}}').on('click', function () {
-                        var input = $('#quantity{{main.product_id}}');
-                        if (parseInt(input.val()) < '{{main.stock}}' ){
-                            input.val(parseInt(input.val()) + 1);
-                        }
-                    })    
-                    </script>
-                    </td>
-                    {% if main.stock > 0 %}
-                        <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
-                    {% else %}
-                        <td><input  type = "Submit"  class="btn btn-danger" value = "Add to Order" disabled="true"></input></td>
-                    {% endif %}
-                   
-                
-
-                </tr>
-            </form>
-    {% endfor %}  
-</table>
-
-    
-
+<div id="Table{{category[2]}}" style="display: none">
+            <div class="row-fluid" id="main">
+                {% for main in category[1] %}
+                {% if loop.index0 % 3 == 0 %}
+                <div class="row">
+                {% endif %}
+                    <div class="col-sm-4">
+                        <button type="button" class="btn-lg btn-block btn-warning" data-toggle="modal" data-target="#orderModal{{main.product_id}}">{{main.name}}</button>
+                    </div>
+                {% if loop.index0 % 3 == 2 or loop.last %}
+                </div>
+                {% endif %}
+                <br>
+                {% endfor %}
+            </div>
+        </div>
 <hr>
+{% for main in category[1] %}
+<!-- Modal -->
+<div class="modal fade" id="orderModal{{ main.product_id}}" role="dialog">
+        <div class="modal-dialog modal-lg">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{main.name}}</h3>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                    <table id="Table{{category[2]}}" class="table">
+                        <th>Price</th>
+                        <th>Message</th>
+                        <th>Quantity</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        </tr>
+                            <form id = "Form{{category[2]}}" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
+                            <td>£{{main.price}}</td>
+                            <td><textarea name = "message{{main.product_id}}" id="message{{main.product_id}}"></textarea></td>
+                            <td>{{main.stock}}</td>
+                            <td><input type="button" id ='SubButton{{main.product_id}}' value = "-">
+                            <input type="number" min= "0" name="quantity{{main.product_id}}" style="width: 50px;" id="quantity{{main.product_id}}"  value =0>
+                            <input type="button" id ='AddButton{{main.product_id}}' value = "+">
+                            <script>
+                            $('#SubButton{{main.product_id}}').on('click', function () {
+                            var input = $('#quantity{{main.product_id}}');
+                            if (parseInt(input.val()) != 0){
+                                input.val(parseInt(input.val()) - 1);
+                                }
+                            })               
+                            </script>
+                            <script>
+                                $('#AddButton{{main.product_id}}').on('click', function () {
+                                var input = $('#quantity{{main.product_id}}');
+                                if (parseInt(input.val()) < '{{main.stock}}' ){
+                                    input.val(parseInt(input.val()) + 1);
+                                }
+                            })    
+                            </script>
+                            </td>
+                            {% if main.stock > 0 %}
+                                <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
+                            {% else %}
+                                <td><input  type = "Submit"  class="btn btn-danger" value = "Add to Order" disabled="true"></input></td>
+                            {% endif %}
+                            <td><button type="" class="btn btn-primary" data-dismiss="modal">Cancel</button></td>
+                        </tr>
+                    </form>
+                </table>
+            </div>
+          </div>
+        </div>
+      </div>
 {% endfor %}
-
-
-
-
-
-
+{% endfor %}
 {% endblock %}

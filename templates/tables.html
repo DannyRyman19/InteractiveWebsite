@@ -33,7 +33,7 @@
         }
     </script>
     {% if tables.active ==  1 %}
-        <h1>Table Number {{id}}<div class="float-right">Seats:<input id="covers" type ="text" style="width: 45px" value="{{tables.covers}}"></div></h1>
+        <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
         {{order_id}}
         <hr>
         <div class ="container">
@@ -45,12 +45,11 @@
                     <a class="btn btn-block btn-success" href="/tables/{{id}}/ordersides">Sides</a>
                     <a class="btn btn-block btn-success" href="./{{id}}/orderdesserts">Desserts</a>
                 </div>
-                
                 <div class="col-sm-5">
-                    <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#myModal">Table Options</button>
+                    <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#tableOptionsModal">Table Options</button>
                     <a class="btn btn-block btn-danger" href="/tables/closetable/{{id}}/">Close Table</a>
                     <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')" value="Print Bill">
-                    {% if tables.covers >= 7 %}
+                    {% if tables.serviceApplied == 1 %}
                     <br>
                     <h4 class="float-right">Total Bill £{{tables.total}}</h4>
                     <br>
@@ -63,10 +62,6 @@
                 </div> 
             </div>
             
-           
-                    
-
-               
             <hr>
 
             <script>
@@ -185,7 +180,7 @@
         </table>
         <br>
         <br>   
-        {% if tables.covers >= 7 %} 
+        {% if tables.serviceApplied == 1 %} 
             <div style="text-align:right">
             <h4>Subtotal: £{{tables.total}}</h4>   
             <h4 >10% Service: £{{tables.service}}</h4>  
@@ -313,11 +308,11 @@
                             <td><textarea id="message{{drink.product_id}}" name="message{{drink.product_id}}" disabled="true">{{drink.message}}</textarea></textarea></td>
                             <td>{{drink.price}}</td>
                             <td>{{drink.subtotal}}</td>
-                            <td><button class="btn btn-success" id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
+                            <td><button class="btn btn-block btn-success" id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button class="btn btn-block btn-primary"style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=drink.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{drink.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{drink.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-block btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
                                     </form>
                             </td>
                     </tr>
@@ -363,11 +358,11 @@
                             <td><textarea id="message{{starter.product_id}}" name="message{{starter.product_id}}" disabled="true">{{starter.message}}</textarea></textarea></td>
                             <td>{{starter.price}}</td>
                             <td>{{starter.subtotal}}</td>
-                            <td><button class="btn btn-success" id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')" type="submit">Save</button></td>
+                            <td><button class="btn btn-block btn-success" id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button class="btn btn-block btn-primary"style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')" type="submit">Save</button></td>
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=starter.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{starter.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{starter.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">x</button>
                                     </form>
                             </td>
                         </tr>
@@ -413,7 +408,7 @@
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=main.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{main.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{main.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
                                     </form>
                             </td>
                         </tr>
@@ -462,7 +457,7 @@
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=side.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{side.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{side.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
                                     </form>
                             </td>
                         </tr>
@@ -510,7 +505,7 @@
                             </form>
                             <td>
                                     <form action="{{url_for('remove_order',id=dessert.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{dessert.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#myModal">x</button>
+                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{dessert.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
                                     </form>
                             </td>
                         </tr>
@@ -521,7 +516,7 @@
     </table>
 
 <!-- Modal -->
-<div class="modal fade" id="myModal" role="dialog">
+<div class="modal fade" id="deleteModal" role="dialog">
         <div class="modal-dialog">
         
           <!-- Modal content-->
@@ -547,4 +542,90 @@
         </div>
       </div>
       
+<!-- Modal -->
+<div class="modal fade" id="tableOptionsModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+            <h3>Table Options</h3>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="container">
+              <div class="row">
+                  <div class="col-sm-4">
+                    <form action="{{url_for('covers',id=tables.table_id)}}" method="POST">
+                        <a href="#coversModal" class="btn btn-primary btn-block" data-toggle="modal" data-dismiss="modal">Edit Covers</a>
+                    </form>
+                  </div>
+                  <div class="col-sm-4">
+                    <button class="btn btn-primary btn-block">Apply Discount</button>                      
+                  </div>
+                    <div class="col-sm-4">
+                      {% if tables.serviceApplied == 0 %}
+                        <form action="{{url_for('service', service = 1, id=tables.table_id)}}" method="POST">
+                            <button action="/tables/service/{{tables.table_id}}/1"class="btn btn-primary btn-success btn-block">Add Service Charge</button> 
+                        </form> 
+                      {% else %}            
+                        <form action="{{url_for('service', service = 0, id=tables.table_id)}}" method="POST">
+                            <button action="/tables/service/{{tables.table_id}}/0"class="btn btn-primary btn-danger btn-block">Remove Service Charge</button> 
+                        </form> 
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade"id="coversModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+        <!-- Modal content-->
+        <div class="modal-content">
+        <div class="modal-header">
+            <h3>Table Options - Edit Covers</h3>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+        </div>
+        <div class="modal-body">
+                <!--<form action="{{url_for('covers', id = tables.table_id)}}" name="coversForm"method="POST">
+                    <p>Covers:  <input type ="number" name="covers" style="width:40px" value="{{tables.covers}}"></p>
+                        <button type="submit" class="btn btn-success btn-danger">Update</button> 
+                </form>  -->
+                {% from "includes/_formhelpers.html" import render_field %}
+                <form method="POST" action="{{url_for('covers', id = tables.table_id)}}">
+                    <div class="form-group">
+                     {{ render_field(form.covers, class_="form-control")}}
+                    </div>
+
+        
+        <p><input class="btn-lg btn-primary" type="submit" value="Submit">
+
+        </div>
+        <div class="modal-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <a href="#tableOptionsModal" class="btn btn-primary" data-toggle="modal" data-dismiss="modal">Back</a>
+                    </div>
+                    <div class="col-sm-3">
+                        <button type="" class="btn btn-danger " data-dismiss="modal">Cancel</button>   
+                           
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+    </div>
+</div>
 {% endblock %}

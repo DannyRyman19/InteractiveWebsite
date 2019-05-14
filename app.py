@@ -126,6 +126,7 @@ def daily_summary():
 @app.route('/tables/<string:id>')
 @is_logged_in
 def tables(id):
+        form = TableForm(request.form)
         cur = mysql.connection.cursor()
         cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
@@ -156,38 +157,31 @@ def tables(id):
         service = 0.00
         totalservice = 0.00
         if str(total) != 'None':
-                
-                if int(covers) < 7:
-                        cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
-                else:
                         service = float(total / 10)
                         totalservice = str(round(((float(total) + service)),2))
                         cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
                         cur.execute(("UPDATE tables SET service = {0} WHERE order_id = '{1}' AND table_id = {2}").format(service,order_id, id))
                         cur.execute(("UPDATE tables SET totalservice = {0} WHERE order_id = '{1}' AND table_id = {2}").format(totalservice,order_id, id))
-
-                mysql.connection.commit()
-                
         else:
                 total = "0.0" + "0"
-
+        mysql.connection.commit()
         cur.close()
         
-        return render_template('tables.html', id = id, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, order_id = order_id)
+        return render_template('tables.html', id = id, form = form, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
 def opentable(id):
-
-      
         form = TableForm(request.form)
-        print(form.covers)
         if request.method == "POST":
                      
                 covers = form.covers.data
                 cur = mysql.connection.cursor()
-                cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s, total = 0.00, date = NOW() WHERE table_id = %s;",("1", covers, id))
+                if int(covers) >= 7:
+                        cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s, total = 0.00, date = NOW(), serviceApplied = 1 WHERE table_id = %s;",("1", covers, id))
+                else:
+                        cur.execute("UPDATE tables SET order_id = UUID(),active = %s, covers = %s, total = 0.00, date = NOW(), serviceApplied = 0 WHERE table_id = %s;",("1", covers, id))
                 mysql.connection.commit()
                 cur.close()
                 mess = ('Table ' + (id)  +' Opened!')
@@ -357,8 +351,32 @@ def remove_order(id,order_id,table_id):
         tables(table_id)
         flash('Item Removed!', 'success')
         return redirect(url_for('tables', id = table_id))
+#Editing Covers
+@app.route('/tables/covers/<string:id>/', methods = ["GET", "POST"])
+@is_logged_in
+def covers(id):       
+        form = TableForm(request.form)
+        covers = form.covers.data
+        cur = mysql.connection.cursor()
+        if int(covers) >=7:
+                cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 1 WHERE table_id = {1};").format(covers, id))    
+        else:
+                cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 0 WHERE table_id = {1};").format(covers, id))        
+        cur.close()
+        tables(id)
+        flash('Covers Updated','success')
+        return redirect(url_for('tables', id = id))
 
-
+#Adding and removing service charge
+@app.route('/tables/service/<string:id>/<int:service>', methods = ["GET", "POST"])
+@is_logged_in
+def service(id,service):
+        cur = mysql.connection.cursor()
+        cur.execute(("UPDATE tables SET serviceApplied = {0} WHERE table_id = {1}").format(service,id))
+        cur.close()
+        tables(id)
+        flash('Service Charge Updated','success')
+        return redirect(url_for('tables', id = id))
 #Close table
 @app.route('/tables/closetable/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
@@ -372,9 +390,8 @@ def close_table(id):
                 date = results['date']
                 order_id = results['order_id']
                 subtotal = float(results['subtotal'])
-                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date))
-  
-        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, totalservice = 0.00 WHERE table_id = {0};").format(id))
+                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date)) 
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00 WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()
         

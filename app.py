@@ -51,7 +51,11 @@ def is_chef(f):
 mysql= MySQL(app)
 @app.route('/restaurant_floor')
 def floor():
-        return render_template('restaurant_floor.html')
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM tables")
+        tables = cur.fetchall()
+        print (tables)
+        return render_template('restaurant_floor.html', tables = tables)
 
 
 @app.route('/kitchen')

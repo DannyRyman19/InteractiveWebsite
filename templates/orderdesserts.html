@@ -1,10 +1,8 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>desserts</h1>
-<h4>Order ID: {{order_id}}</h4>
+<h1>Order Desserts - Table {{table_id}}</h1>
 <hr>
-
 <div id="Tabledesserts">
             <div class="row-fluid" id="main">
                 {% for dessert in desserts %}

@@ -1,8 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>Drinks</h1>
-<h4>Order ID: {{order_id}}</h4>
+<h1>Order Drinks - Table {{table_id}}</h1>
 <hr>
 
 {% for category in sub_categories %}
@@ -14,6 +13,7 @@
     });
 </script>
 <div id="Table{{category[2]}}" style="display: none">
+    <br>
             <div class="row-fluid" id="main">
                 {% for drink in category[1] %}
                 {% if loop.index0 % 3 == 0 %}

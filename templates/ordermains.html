@@ -1,8 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>Mains</h1>
-<h4>Order ID: {{order_id}}</h4>
+<h1>Order Mains - Table {{table_id}}</h1>
 <hr>
 
 {% for category in sub_categories %}
@@ -14,9 +13,11 @@
     });
 </script>
 <div id="Table{{category[2]}}" style="display: none">
+    <br>
             <div class="row-fluid" id="main">
                 {% for main in category[1] %}
                 {% if loop.index0 % 3 == 0 %}
+                
                 <div class="row">
                 {% endif %}
                     <div class="col-sm-4">
@@ -27,6 +28,8 @@
                         {% else %}
                             <button type="button" class="btn-lg btn-block btn-success" data-toggle="modal" data-target="#orderModal{{main.product_id}}">{{main.name}} ({{main.stock}})</button>
                         {% endif %}
+                
+                        
                     </div>
                 {% if loop.index0 % 3 == 2 or loop.last %}
                 </div>

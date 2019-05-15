@@ -131,6 +131,7 @@ def daily_summary():
 @is_logged_in
 def tables(id):
         form = TableForm(request.form)
+        discountForm = DiscountForm(request.form)
         cur = mysql.connection.cursor()
         cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
@@ -171,7 +172,7 @@ def tables(id):
         mysql.connection.commit()
         cur.close()
         
-        return render_template('tables.html', id = id, form = form, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, order_id = order_id)
+        return render_template('tables.html', id = id, form = form, discountForm = discountForm, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, order_id = order_id)
 
 #open table
 @app.route('/tables/opentable/<string:id>/', methods = ["GET", "POST"])
@@ -406,7 +407,11 @@ def close_table(id):
 
 class TableForm(Form):
         covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6'),('7','7'),('8','8'),('9','9'),('10','10'),('11','11'),('12','12'),('13','13'),('14','14'),('15','15')])
-     
+
+class DiscountForm(Form):
+        discount = SelectField('Apply Discount', choices=[('1','10% off Food'),('2','20% off Food'),('3','30% off Food'),('4','25% off bill'),('5','50% off Food'),('6','10% off Bill'),('7','20% off bill'),('8','100% Discount')])     
+        discountCode = TextAreaField('Discount Code:', [validators.Length(min=15,max=15)])
+
 @app.route('/')
 def index():
         return render_template('home.html')

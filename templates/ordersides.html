@@ -5,68 +5,80 @@
 <h4>Order ID: {{order_id}}</h4>
 <hr>
 
-<table id="TableSides" class="table table-striped">
-        <tr><th>Name</th>
-        <th>Price</th>
-        <th>Optional Message</th>
-        <th>Stock</th>
-        <th>Quantity</th>
-        
-        <th></th>
-
-    </tr>
-{% for side in sides %}
-
-
-
-  
-            <tr>
-                    <form id = "Form{{side.product_id}}" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{side.product_id}}/{{side.price}}/" method = "POST">
-                    <td>{{side.name}}</td> 
-                    <td>£{{side.price}}</td>
-                    <td><textarea style="width: 100px;" name = "message{{side.product_id}}" id="message{{side.product_id}}"></textarea></td>
-                    <td>{{side.stock}}</td>
-                    <td><input type="button" id ='SubButton{{side.product_id}}' value = "-">
-                    <input type="number" min= "0" name="quantity{{side.product_id}}" style="width: 30px;" id="quantity{{side.product_id}}" value =0>
-                    <input type="button" id ='AddButton{{side.product_id}}' value = "+">
-                    <script>
-                    $('#SubButton{{side.product_id}}').on('click', function () {
-                    var input = $('#quantity{{side.product_id}}');
-                    if (parseInt(input.val()) != 0){
-                        input.val(parseInt(input.val()) - 1);
-                        }
-                    })               
-                    </script>
-                    <script>
-                        $('#AddButton{{side.product_id}}').on('click', function () {
-                        var input = $('#quantity{{side.product_id}}');
-                        if (parseInt(input.val()) < '{{side.stock}}' ){
-                            input.val(parseInt(input.val()) + 1);
-                        }
-                    })    
-                    </script>
-                    </td>
-                    {% if side.stock > 0 %}
-                        <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
-                    {% else %}
-                        <td><input  type = "Submit"  class="btn btn-danger" value = "Add to Order" disabled="true"></input></td>
-                    {% endif %}
-                   
-                
-
-                </tr>
-            </form>
-    {% endfor %}  
-</table>
-
-    
-
+<div id="TableSides">
+            <div class="row-fluid" id="main">
+                {% for side in sides %}
+                {% if loop.index0 % 3 == 0 %}
+                <div class="row">
+                {% endif %}
+                    <div class="col-sm-4">
+                        {% if side.stock == 0  %}
+                            <button type="button" class="btn-lg btn-block btn-danger" data-toggle="modal" data-target="#orderModal{{side.product_id}}" disabled="true">{{side.name}} ({{side.stock}})</button>
+                        {% elif side.stock <= 30 %}
+                            <button type="button" class="btn-lg btn-block btn-warning" data-toggle="modal" data-target="#orderModal{{side.product_id}}">{{side.name}} ({{side.stock}})</button>
+                        {% else %}
+                            <button type="button" class="btn-lg btn-block btn-success" data-toggle="modal" data-target="#orderModal{{side.product_id}}">{{side.name}} ({{side.stock}})</button>
+                        {% endif %}
+                    </div>
+                {% if loop.index0 % 3 == 2 or loop.last %}
+                </div>
+                {% endif %}
+                <br>
+                {% endfor %}
+            </div>
+        </div>
 <hr>
-
-
-
-
-
-
-
+{% for side in sides %}
+<!-- Modal -->
+<div class="modal fade" id="orderModal{{ side.product_id}}" role="dialog">
+        <div class="modal-dialog modal-lg">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{side.name}}</h3>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                    <table id="TableSide" class="table">
+                        <th>Price</th>
+                        <th>Message</th>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th></th>
+                        <th></th>
+                        </tr>
+                            <form id = "FormSide" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{side.product_id}}/{{side.price}}/" method = "POST">
+                            <td>£{{side.price}}</td>
+                            <td><textarea name = "message{{side.product_id}}" id="message{{side.product_id}}"></textarea></td>
+                            <td>{{side.stock}}</td>
+                            <td><input type="button" id ='SubButton{{side.product_id}}' value = "-">
+                            <input type="number" min= "0" name="quantity{{side.product_id}}" style="width: 50px;" id="quantity{{side.product_id}}"  value =0>
+                            <input type="button" id ='AddButton{{side.product_id}}' value = "+">
+                            <script>
+                            $('#SubButton{{side.product_id}}').on('click', function () {
+                            var input = $('#quantity{{side.product_id}}');
+                            if (parseInt(input.val()) != 0){
+                                input.val(parseInt(input.val()) - 1);
+                                }
+                            })               
+                            </script>
+                            <script>
+                                $('#AddButton{{side.product_id}}').on('click', function () {
+                                var input = $('#quantity{{side.product_id}}');
+                                if (parseInt(input.val()) < '{{side.stock}}' ){
+                                    input.val(parseInt(input.val()) + 1);
+                                }
+                            })    
+                            </script>
+                            </td>
+                            <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
+                            <td><button type="" class="btn btn-primary" data-dismiss="modal">Cancel</button></td>
+                        </tr>
+                    </form>
+                </table>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endfor %}
 {% endblock %}

@@ -618,18 +618,18 @@
                     <div class="form-group">
                      {{ render_field(form.covers, class_="form-control")}}
                     </div>
-                <input class="btn btn-success" type="submit" value="Update">
+                <input class="btn btn-success btn-block" type="submit" value="Update">
                 </form>
         </div>
 
         <div class="modal-footer">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-9">
-                        <a href="#tableOptionsModal" class="btn btn-primary" data-toggle="modal" data-dismiss="modal">Back</a>
+                    <div class="col-sm-6">
+                        <a href="#tableOptionsModal" class="btn btn-primary btn-block" data-toggle="modal" data-dismiss="modal">Back</a>
                     </div>
-                    <div class="col-sm-3">
-                        <button class="btn btn-danger float-right " data-dismiss="modal">Cancel</button>   
+                    <div class="col-sm-6">
+                        <button class="btn btn-danger btn-block " data-dismiss="modal">Cancel</button>   
                            
                     </div>
                 </div>
@@ -659,22 +659,26 @@
                             {{ render_field(discountForm.discount, class_="form-control")}}
                             {{ render_field(discountForm.discountCode, class_="form-control")}}
                         </div>
-                    <input class="btn btn-success" type="submit" value="Apply Discount">
+                    <center>
+                        <input class="btn btn-success btn-block" type="submit" value="Apply Discount">
+                    </center>   
                     </form>
                 {% else %}
+                <center>
                     <h3>Current Discount Applied: {{tables.discountMessage}}</h3>
                     <form method="POST" action="{{url_for('removediscount', id = tables.table_id)}}">
-                        <input class="btn btn-success" type="submit" value="Remove Discount">
+                        <input class="btn btn-danger btn-block" type="submit" value="Remove Discount">
+                </center>
                 {% endif %}
             </div>
             <div class="modal-footer">
                 <div class="container">
                     <div class="row">
-                        <div class="col-sm-9">
-                            <a href="#tableOptionsModal" class="btn btn-primary" data-toggle="modal" data-dismiss="modal">Back</a>
+                        <div class="col-sm-6">
+                            <a href="#tableOptionsModal" class="btn btn-primary btn-block" data-toggle="modal" data-dismiss="modal">Back</a>
                         </div>
-                        <div class="col-sm-3">
-                            <button class="btn btn-danger float-right " data-dismiss="modal">Cancel</button>   
+                        <div class="col-sm-6">
+                            <button class="btn btn-danger btn-block" data-dismiss="modal">Cancel</button>   
                                
                         </div>
                     </div>

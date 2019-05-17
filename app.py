@@ -359,9 +359,13 @@ def remove_order(id,order_id,table_id):
 @app.route('/tables/covers/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
 def covers(id):       
+         
         form = TableForm(request.form)
-        covers = form.covers.data
-        cur = mysql.connection.cursor()
+        cur = mysql.connection.cursor()        
+        cur.execute(("SELECT covers FROM tables WHERE table_id = {0};").format(id))
+        covers = cur.fetchone()
+        form.covers.data= covers['covers']
+        covers = request.form['covers']
         if int(covers) >=7:
                 cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 1 WHERE table_id = {1};").format(covers, id))    
         else:
@@ -382,6 +386,7 @@ def removediscount(id):
         mysql.connection.commit()
         cur.close()
         tables(id)
+        flash('Discount Removed!','success')
         return redirect(url_for('tables', id = id))
 
 #Adding a discount
@@ -420,11 +425,12 @@ def discount(id):
                                 cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.1,"10% off Food",id))
                         mysql.connection.commit()
                         cur.close()
+                        tables(id)
                         flash('Discount Applied!','success')
+
                 except:
                         flash('Discount could not be applied. No items could be discounted!','danger')
 
-        tables(id)
         return redirect(url_for('tables', id = id))
 
 #Adding and removing service charge

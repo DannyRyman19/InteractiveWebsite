@@ -49,7 +49,25 @@
                     <a class="btn btn-block btn-danger" href="/tables/closetable/{{id}}/">Close Table</a>
                     <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')" value="Print Bill">
 
-                    <h4 class="float-right">Discounts £0.00</h4>
+                    {% if tables.discountType == 1 %}
+                        <h4 class="float-right"> 10% Off Food Discount: £{{tables.discountAmount}}</h4>
+                    {% elif tables.discountType == 2 %}
+                        <h4 class="float-right"> 20% Off Food Discount: £{{tables.discountAmount}}</h4>
+                    {% elif tables.discountType == 3 %}
+                        <h4 class="float-right"> 30% Off Food Discount: £{{tables.discountAmount}}</h4>
+                    {% elif tables.discountType == 4 %}
+                        <h4 class="float-right"> 25% Off Bill Discount: £{{tables.discountAmount}}</h4>
+                    {% elif tables.discountType == 5 %}
+                        <h4 class="float-right"> 50% Off Food Discount: £{{tables.discountAmount}}</h4>
+                    {% elif tables.discountType == 6 %}
+                        <h4 class="float-right"> 10% Off Bill Discount: £{{tables.discountAmount}}</h4>
+                    {% elif tables.discountType == 7 %}
+                        <h4 class="float-right"> 20% Off Bill Discount: £{{tables.discountAmount}}</h4>
+                    {% else %}
+                     <h4 class="float-right"> 100% Off Bill Discount: £{{tables.discountAmount}}</h4>
+                    {% endif %}
+
+
                     <br>
                     <br>
                     {% if tables.serviceApplied == 1 %}
@@ -609,6 +627,7 @@
                      {{ render_field(form.covers, class_="form-control")}}
                     </div>
                 <input class="btn btn-success" type="submit" value="Update">
+                </form>
         </div>
 
         <div class="modal-footer">
@@ -642,13 +661,13 @@
             </div>
             <div class="modal-body">     
                 {% from "includes/_formhelpers.html" import render_field %}
-                <form method="POST" action="">
+                <form method="POST" action="{{url_for('discount', id = tables.table_id)}}">
                     <div class="form-group">
                         {{ render_field(discountForm.discount, class_="form-control")}}
                         {{ render_field(discountForm.discountCode, class_="form-control")}}
                     </div>
-                <input class="btn btn-success" type="submit" value="Update">
-    
+                <input class="btn btn-success" type="submit" value="Apply Discount">
+                </form>
             </div>
             <div class="modal-footer">
                 <div class="container">

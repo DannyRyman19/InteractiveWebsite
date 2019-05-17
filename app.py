@@ -121,7 +121,7 @@ def daily_summary():
         cur.execute(("SELECT sum(covers) as DailyCovers FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
         DailyCovers = cur.fetchone()
         DailyCovers = DailyCovers['DailyCovers']
-        cur.execute(("SELECT order_item.product_id, order_item.quantity, order_item.subtotal, product.name FROM restaurant.order_item, restaurant.product WHERE last_order_time LIKE '%{0}%' AND order_item.product_id = product.product_id;").format(date))
+        cur.execute(("SELECT order_item.product_id, sum(order_item.quantity) as quantityTotal, sum(order_item.subtotal) as total, product.name FROM restaurant.order_item, restaurant.product WHERE last_order_time LIKE '%{0}%' AND order_item.product_id = product.product_id GROUP BY product.name, order_item.product_id").format(date))
         DailyItems = cur.fetchall()
         cur.close()
         return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables, displayDate = displayDate, DailyItems= DailyItems)
@@ -157,10 +157,10 @@ def tables(id):
         total = total['total']
         if str(total) == 'None':
                 total = 0.00
-        print (total)
-        covers = tables['covers']
-        service = 0.00
-        totalservice = 0.00
+                service = 0.00
+                totalservice = 0.00
+        else:
+                total -= tables['discountAmount']
         if str(total) != 'None':
                         service = float(total / 10)
                         totalservice = str(round(((float(total) + service)),2))
@@ -367,10 +367,35 @@ def covers(id):
         if int(covers) >=7:
                 cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 1 WHERE table_id = {1};").format(covers, id))    
         else:
-                cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 0 WHERE table_id = {1};").format(covers, id))        
+                cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 0 WHERE table_id = {1};").format(covers, id))   
+        mysql.connection.commit()             
         cur.close()
         tables(id)
         flash('Covers Updated','success')
+        return redirect(url_for('tables', id = id))
+
+#Adding a discount
+@app.route('/tables/discount/<string:id>/', methods = ["GET", "POST"])
+@is_logged_in
+def discount(id):
+        
+        form = DiscountForm(request.form)
+        discountCode = form.discountCode.data
+        discount = form.discount.data
+        if len(discountCode) != 15: #Potentially have a database with a bunch of valid discount codes in that this can check against in the future.
+                 flash('Discount not applied. Not a valid discount code!','danger')
+        else:
+                cur = mysql.connection.cursor() 
+                cur.execute(("UPDATE tables set discountCode = '{0}', discountType = {1} WHERE (table_id = {2});").format(discountCode,discount,id))
+                cur.execute(("SELECT * FROM tables WHERE table_id = {0}").format(id))
+                tables = cur.fetchone()
+                if int(discount) == 8:
+                        cur.execute(("UPDATE TABLES SET discountAmount = {0}, serviceApplied = 0 WHERE table_id = {1}").format(tables['total'],id))
+                elif int(discount) == 7:
+                        cur.execute(("UPDATE TABLES SET discountAmount = {0} WHERE table_id = {1}").format(float(tables['total'])*0.2,id))
+
+                mysql.connection.commit()
+                cur.close()
         return redirect(url_for('tables', id = id))
 
 #Adding and removing service charge
@@ -379,16 +404,18 @@ def covers(id):
 def service(id,service):
         cur = mysql.connection.cursor()
         cur.execute(("UPDATE tables SET serviceApplied = {0} WHERE table_id = {1}").format(service,id))
+        mysql.connection.commit()
         cur.close()
         tables(id)
         flash('Service Charge Updated','success')
         return redirect(url_for('tables', id = id))
+
 #Close table
 @app.route('/tables/closetable/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
-        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
+        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
         results = cur.fetchone()
         if str(results) != "None":
                 covers =int(results['covers'])
@@ -396,8 +423,17 @@ def close_table(id):
                 date = results['date']
                 order_id = results['order_id']
                 subtotal = float(results['subtotal'])
-                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed) VALUES ({0},{1},{2},'{3}','{4}', NOW())").format(covers,table_id,subtotal,order_id,date)) 
-        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00 WHERE table_id = {0};").format(id))
+                serviceApplied = results['serviceApplied']
+                discountAmount = float(results['discountAmount'])
+                discountCode = results['discountCode']
+                discountType = results['discountType']
+                if str(discountCode) == 'None':
+                        if str(discountType) == 'None':
+                                discountCode = ''
+                                discountType = 0
+                                print("done")
+                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}')").format(covers,table_id,subtotal,order_id,date,serviceApplied,discountAmount, discountCode, discountType))
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00, serviceApplied = 0, discountCode = NULL, discountType = NULL, discountAmount = 0.00 WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()
         
@@ -410,7 +446,7 @@ class TableForm(Form):
 
 class DiscountForm(Form):
         discount = SelectField('Apply Discount', choices=[('1','10% off Food'),('2','20% off Food'),('3','30% off Food'),('4','25% off bill'),('5','50% off Food'),('6','10% off Bill'),('7','20% off bill'),('8','100% Discount')])     
-        discountCode = TextAreaField('Discount Code:', [validators.Length(min=15,max=15)])
+        discountCode = TextAreaField('Discount Code:')
 
 @app.route('/')
 def index():
@@ -438,7 +474,6 @@ def add_product():
         if request.args.get('type'):
                 form.category_id.process_data(request.args.get('type'))
         if request.method == "POST" and form.validate():
-                     
                 name = form.name.data
                 description = form.description.data
                 price = form.price.data

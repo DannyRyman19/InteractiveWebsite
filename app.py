@@ -161,14 +161,12 @@ def tables(id):
                 totalservice = 0.00
         else:
                 total -= tables['discountAmount']
-        if str(total) != 'None':
-                        service = float(total / 10)
-                        totalservice = str(round(((float(total) + service)),2))
-                        cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
-                        cur.execute(("UPDATE tables SET service = {0} WHERE order_id = '{1}' AND table_id = {2}").format(service,order_id, id))
-                        cur.execute(("UPDATE tables SET totalservice = {0} WHERE order_id = '{1}' AND table_id = {2}").format(totalservice,order_id, id))
-        else:
-                total = "0.0" + "0"
+                service = float(total / 10)
+                totalservice = str(round(((float(total) + service)),2))
+                cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
+                cur.execute(("UPDATE tables SET service = {0} WHERE order_id = '{1}' AND table_id = {2}").format(service,order_id, id))
+                cur.execute(("UPDATE tables SET totalservice = {0} WHERE order_id = '{1}' AND table_id = {2}").format(totalservice,order_id, id))
+        
         mysql.connection.commit()
         cur.close()
         
@@ -374,6 +372,18 @@ def covers(id):
         flash('Covers Updated','success')
         return redirect(url_for('tables', id = id))
 
+#Removing a discount
+@app.route('/tables/removediscount/<string:id>/', methods = ["GET", "POST"])
+@is_logged_in
+def removediscount(id):
+        
+        cur = mysql.connection.cursor() 
+        cur.execute(("UPDATE tables set discountCode = NULL, discountType = 0, discountMessage = NULL, discountAmount = 0.00 WHERE (table_id = {0});").format(id))
+        mysql.connection.commit()
+        cur.close()
+        tables(id)
+        return redirect(url_for('tables', id = id))
+
 #Adding a discount
 @app.route('/tables/discount/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
@@ -383,19 +393,38 @@ def discount(id):
         discountCode = form.discountCode.data
         discount = form.discount.data
         if len(discountCode) != 15: #Potentially have a database with a bunch of valid discount codes in that this can check against in the future.
-                 flash('Discount not applied. Not a valid discount code!','danger')
+                flash('Discount not applied. Not a valid discount code!','danger')
         else:
                 cur = mysql.connection.cursor() 
                 cur.execute(("UPDATE tables set discountCode = '{0}', discountType = {1} WHERE (table_id = {2});").format(discountCode,discount,id))
                 cur.execute(("SELECT * FROM tables WHERE table_id = {0}").format(id))
-                tables = cur.fetchone()
-                if int(discount) == 8:
-                        cur.execute(("UPDATE TABLES SET discountAmount = {0}, serviceApplied = 0 WHERE table_id = {1}").format(tables['total'],id))
-                elif int(discount) == 7:
-                        cur.execute(("UPDATE TABLES SET discountAmount = {0} WHERE table_id = {1}").format(float(tables['total'])*0.2,id))
+                tablesDict = cur.fetchone()
+                cur.execute(("SELECT SUM(subtotal) AS total FROM order_item, product, sub_category WHERE order_id = '{0}' AND table_id = {1} and order_item.product_id = product.product_id and product.subcategory_id = sub_category.subcategory_id and sub_category.subcategory_id > 7").format(tablesDict['order_id'],id))
+                price = cur.fetchone()
+                try:
+                        if int(discount) == 8:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, serviceApplied = 0, discountMessage = '{1}' WHERE table_id = {2}").format(tablesDict['total'],"100% off Bill",id))
+                        elif int(discount) == 7:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(tablesDict['total'])*0.2,"20% off Bill",id))
+                        elif int(discount) == 6:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(tablesDict['total'])*0.1,"10% off Bill",id))
+                        elif int(discount) == 5:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.5,"50% off Food",id))     
+                        elif int(discount) == 4:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(tablesDict['total'])*0.25,"25% off Food",id))
+                        elif int(discount) == 3:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.3,"30% off Food",id))
+                        elif int(discount) == 2:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.2,"20% off Food",id))
+                        elif int(discount) == 1:
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.1,"10% off Food",id))
+                        mysql.connection.commit()
+                        cur.close()
+                        flash('Discount Applied!','success')
+                except:
+                        flash('Discount could not be applied. No items could be discounted!','danger')
 
-                mysql.connection.commit()
-                cur.close()
+        tables(id)
         return redirect(url_for('tables', id = id))
 
 #Adding and removing service charge
@@ -415,7 +444,7 @@ def service(id,service):
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
-        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
+        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode, tables.discountMessage FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
         results = cur.fetchone()
         if str(results) != "None":
                 covers =int(results['covers'])
@@ -427,13 +456,14 @@ def close_table(id):
                 discountAmount = float(results['discountAmount'])
                 discountCode = results['discountCode']
                 discountType = results['discountType']
+                discountMessage = results['discountMessage']
                 if str(discountCode) == 'None':
                         if str(discountType) == 'None':
                                 discountCode = ''
+                                discountMessage = ''
                                 discountType = 0
-                                print("done")
-                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}')").format(covers,table_id,subtotal,order_id,date,serviceApplied,discountAmount, discountCode, discountType))
-        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00, serviceApplied = 0, discountCode = NULL, discountType = NULL, discountAmount = 0.00 WHERE table_id = {0};").format(id))
+                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType, discountMessage) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}','{9}')").format(covers,table_id,subtotal,order_id,date,serviceApplied,discountAmount, discountCode, discountType, discountMessage))
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00, serviceApplied = 0, discountCode = NULL, discountType = 0, discountAmount = 0.00, discountMessage = NULL WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()
         

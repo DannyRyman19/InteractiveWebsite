@@ -284,24 +284,31 @@ def orderdesserts(table_id):
 @app.route('/tables/<string:id>/add_to_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
 @is_logged_in
 def add_to_order(id, order_id, product_id, price):
+        cur = mysql.connection.cursor()
         quantity = request.form.get("quantity" + str(product_id))
         message = request.form.get("message" + str(product_id))
+        cur.execute(("SELECT stock FROM product_variation where product_id = {0}").format(product_id))
+        stock= cur.fetchone()
+        stock = stock['stock']
         if int(quantity) > 0 :
-                price = float(price)
-                cur = mysql.connection.cursor()
-                cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
-                result= cur.fetchone()  
-                result = result['exist']
-                if message == "":
-                        if int(result) > 0 :
-                                cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})), last_order_time = NOW()  WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
+                if int(stock) - int(quantity) > 0:
+                        price = float(price)
+                        cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
+                        result= cur.fetchone()  
+                        result = result['exist']
+                        if message == "":
+                                if int(result) > 0 :
+                                        cur.execute(("UPDATE order_item SET quantity = (quantity + {0}), subtotal=( subtotal +  ({1} * {2})), last_order_time = NOW()  WHERE table_id = {3} and product_id = {4} and order_id = '{5}' ").format(quantity, price, quantity,id, product_id, order_id))
+                                else:
+                                        cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
                         else:
-                                cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
+                                cur.execute(("INSERT INTO order_item(order_id, table_id, quantity, subtotal, product_id, message, last_order_time)  VALUES('{0}',{1},{2},{3},{4},'{5}',NOW())").format(order_id, id, quantity, int(quantity) * price, product_id, message))
+                        
+                        cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
+                        mysql.connection.commit()
                 else:
-                        cur.execute(("INSERT INTO order_item(order_id, table_id, quantity, subtotal, product_id, message, last_order_time)  VALUES('{0}',{1},{2},{3},{4},'{5}',NOW())").format(order_id, id, quantity, int(quantity) * price, product_id, message))
-                
-                cur.execute(("UPDATE product_variation SET stock = (stock - {0}) WHERE product_id = {1}").format(quantity,product_id))
-                mysql.connection.commit()
+                        tables(id)        
+                        flash("Please add a valid quantity.", 'danger')
                 
         else:
                 flash("Please add a valid quantity.", 'danger')
@@ -312,36 +319,45 @@ def add_to_order(id, order_id, product_id, price):
 @app.route('/tables/<string:id>/update_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
 @is_logged_in
 def update_order(id, order_id, product_id, price):
-        quantity = int(request.form.get("quantity" + str(product_id)))
-        message = request.form.get("message" + str(product_id))
-        cur = mysql.connection.cursor()
-        cur.execute(("SELECT quantity from order_item WHERE table_id = {0} and order_id = '{1}' and product_id = {2}").format(id, order_id,product_id))
-        currentquantity = cur.fetchone()
-        currentquantity = currentquantity['quantity']
-        #print(("Current Quantity:{0}").format(currentquantity))
+        try:
+                quantity = int(request.form.get("quantity" + str(product_id)))
+                message = request.form.get("message" + str(product_id))
+                cur = mysql.connection.cursor()
+                cur.execute(("SELECT quantity from order_item WHERE table_id = {0} and order_id = '{1}' and product_id = {2}").format(id, order_id,product_id))
+                currentquantity = cur.fetchone()
+                currentquantity = currentquantity['quantity']
+                #print(("Current Quantity:{0}").format(currentquantity))
 
-        if quantity > 0 :
-                price = float(price)
-                cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
-                result= cur.fetchone()  
-                result = result['exist']
-                
-                if int(result) > 0 :
-                        cur.execute(("UPDATE order_item SET quantity = {0}, subtotal=({1} * {2}), last_order_time = NOW(), message = '{3}'  WHERE table_id = {4} and product_id = {5} and order_id = '{6}' ").format(quantity, price, quantity,message,id, product_id,order_id))
-                else:
-                        cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
-        
-                cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id))
+                if quantity > 0 :
+                        price = float(price)
+                        cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
+                        result= cur.fetchone()  
+                        result = result['exist']
+                        cur.execute(("SELECT stock FROM product_variation where product_id = {0}").format(product_id))
+                        stock= cur.fetchone()
+                        stock = stock['stock']
+                        if int(stock) - quantity > 0:
+                                if int(result) > 0 :
+                                        cur.execute(("UPDATE order_item SET quantity = {0}, subtotal=({1} * {2}), last_order_time = NOW(), message = '{3}'  WHERE table_id = {4} and product_id = {5} and order_id = '{6}' ").format(quantity, price, quantity,message,id, product_id,order_id))
+                                else:
+                                        cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
+                        
+                                cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id))
+                                mysql.connection.commit()
+                                cur.close()
+                        else:
+                                tables(id)
+                                flash(('Not enough stock! Current stock {0}').format(stock),'danger')
+                elif quantity == 0:
 
-                mysql.connection.commit()
-                cur.close()
-        elif quantity == 0:
-                remove_order(product_id,order_id,id)
-                
-        else:
+                        remove_order(product_id,order_id,id)
+                return redirect(url_for('tables', id = id))
+                        
+        except:
                 flash("Please add a valid quantity.", 'danger')
-        tables(id)
-        return redirect(url_for('tables', id = id))
+                return redirect(url_for('tables', id = id))
+
+
 
 #remove from order
 @app.route('/remove_order/<int:id>/<string:order_id>/<string:table_id>', methods = ["GET","POST"])

@@ -10,7 +10,7 @@
         <p>Date Closed: {{history.date_closed}}</p>
         
         <hr>
-            <div class="float-right"><h2>Total Bill £{{total}}</h2></div>
+            <div class="float-right"><h2>Total Bill £{{history.total}} {{history.discountAmount}} {{history.discountMessage}}</h2></div>
             <script>
                 $(document).ready( function () {
                   $('#all').DataTable();

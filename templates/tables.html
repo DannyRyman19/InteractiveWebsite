@@ -318,7 +318,7 @@
                     
                     <tr>
                             <form id = "Form{{drink.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
-                            <td><input type="number" id="quantity{{drink.product_id}}" name="quantity{{drink.product_id}}" value="{{drink.quantity}}" disabled="true"></td>
+                            <td><center><input type="number" id="quantity{{drink.product_id}}" name="quantity{{drink.product_id}}" value="{{drink.quantity}}" style="width:50px; text-align: center" disabled="true"></center></td>
                             <td>{{drink.name}}</td>
                             <td><textarea id="message{{drink.product_id}}" name="message{{drink.product_id}}" disabled="true">{{drink.message}}</textarea></textarea></td>
                             <td>{{drink.price}}</td>

@@ -21,9 +21,32 @@
     <h1>Stock Management</h1>
     <h3><small>Welcome {{session.name}}</small></h3>
     <hr>
-    <a class="btn btn-block btn-success float-right" href="/add_product">Add Product</a>
-<br>
-<br>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <a class="btn btn-block btn-success" href="/add_product?type=1">Add Drink</a>
+            </div>
+            <div class="col-lg-3">
+                <a class="btn btn-block btn-success" href="/add_product?type=2">Add Starter</a>
+            </div>
+            <div class="col-lg-3">
+                <a class="btn btn-block btn-success" href="/add_product?type=3">Add Main</a>
+            </div>
+            <div class="col-lg-3">
+                <a class="btn btn-block btn-success" href="/add_product?type=4">Add Side</a>
+            </div>
+            <br>
+            <br>
+            <div class="col-lg-4">
+            </div>
+                      
+            <div class="col-lg-4">
+                    <a class="btn btn-block btn-success" href="/add_product?type=5">Add Dessert</a>
+            </div>
+            <div class="col-lg-4">
+            </div>  
+        </div>
+    </div>
 
  
     <hr>

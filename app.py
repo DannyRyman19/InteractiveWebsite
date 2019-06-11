@@ -303,7 +303,7 @@ def add_to_order(id, order_id, product_id, price):
         if int(quantity) > 0 :
                 if int(stock) - int(quantity) > 0:
                         price = float(price)
-                        cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1}").format(order_id, product_id))
+                        cur.execute(("SELECT COUNT(*) AS exist FROM order_item where order_id = '{0}' and product_id = {1} and message = Null").format(order_id, product_id))
                         result= cur.fetchone()  
                         result = result['exist']
                         if message == "":

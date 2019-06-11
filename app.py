@@ -35,7 +35,7 @@ def is_manager(f):
                         flash("You must be a manager to access this page", 'danger')
                         return redirect(url_for('floor'))
         return wrap
-
+#chef check - checks if the logged in user is a chef, chefs cn access stock management and floor
 def is_chef(f):
         @wraps(f)
         def wrap(*args, **kwargs):
@@ -57,11 +57,21 @@ def floor():
         print (tables)
         return render_template('restaurant_floor.html', tables = tables)
 
-
+#kitchen page - will show orders for the kitchen to see
 @app.route('/kitchen')
 def kitchen():
-        return render_template('kitchen.html')
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT order_id, table_id FROM tables WHERE active = 1")
+        activeTables = cur.fetchall()
+        print(activeTables)
+        tables = []
+        for table in activeTables:
+                cur.execute(("SELECT sum(product_variation.price) AS price, product.name, tables.table_id, order_item.message, product.product_id, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} GROUP BY product.name, order_item.message, product.product_id;").format(table['order_id'], table['table_id']))
+                tables.append(cur.fetchall())
+        print(tables)
+        return render_template('kitchen.html', tables = tables)
 #SELECT * FROM restaurant.order_item WHERE  LIKE '%2019-05-03%' and table_id = 1;
+
 #Bill History
 @app.route('/bill_history')
 @is_logged_in
@@ -135,9 +145,13 @@ def tables(id):
         cur = mysql.connection.cursor()
         cur.execute(("SELECT * FROM tables where table_id = {0};").format(id))
         tables = cur.fetchone()
-        print(tables)
         order_id=tables['order_id']
-        
+        form = TableForm(request.form)
+        cur = mysql.connection.cursor()        
+        cur.execute(("SELECT covers FROM tables WHERE table_id = {0};").format(id))
+        covers = cur.fetchone()
+        form.covers.process_data(covers['covers'])
+
         for i in range(1,6):
                 cur.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, product.product_id, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = {2} GROUP BY product.name, order_item.message, product.product_id;").format(order_id, id,i))
                 if i == 1:
@@ -151,7 +165,6 @@ def tables(id):
                 else:
                         desserts = cur.fetchall()
         
-        
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
         total = total['total']
@@ -163,10 +176,7 @@ def tables(id):
                 total -= tables['discountAmount']
                 service = float(total / 10)
                 totalservice = str(round(((float(total) + service)),2))
-                cur.execute(("UPDATE tables SET total = {0} WHERE order_id = '{1}' AND table_id = {2}").format(total,order_id, id))
-                cur.execute(("UPDATE tables SET service = {0} WHERE order_id = '{1}' AND table_id = {2}").format(service,order_id, id))
-                cur.execute(("UPDATE tables SET totalservice = {0} WHERE order_id = '{1}' AND table_id = {2}").format(totalservice,order_id, id))
-        
+                cur.execute(("UPDATE tables SET total = {0}, service = {1}, totalservice = {2} WHERE order_id = '{3}' AND table_id = {4}").format(total,service,totalservice,order_id, id))
         mysql.connection.commit()
         cur.close()
         
@@ -375,12 +385,7 @@ def remove_order(id,order_id,table_id):
 @app.route('/tables/covers/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
 def covers(id):       
-         
-        form = TableForm(request.form)
-        cur = mysql.connection.cursor()        
-        cur.execute(("SELECT covers FROM tables WHERE table_id = {0};").format(id))
-        covers = cur.fetchone()
-        form.covers.data= covers['covers']
+        cur = mysql.connection.cursor()
         covers = request.form['covers']
         if int(covers) >=7:
                 cur.execute(("UPDATE tables SET covers = {0}, serviceApplied = 1 WHERE table_id = {1};").format(covers, id))    

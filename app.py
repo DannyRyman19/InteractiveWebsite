@@ -403,7 +403,11 @@ def covers(id):
 def removediscount(id):
         
         cur = mysql.connection.cursor() 
+        cur.execute(("SELECT discountCode from tables where table_id = {0} ").format(id))
+        discount_code = cur.fetchone()
+        discount_code = discount_code['discountCode']
         cur.execute(("UPDATE tables set discountCode = NULL, discountType = 0, discountMessage = NULL, discountAmount = 0.00 WHERE (table_id = {0});").format(id))
+        cur.execute(("UPDATE discounts set used = 0 WHERE discount_code = '{0}'").format(discount_code))
         mysql.connection.commit()
         cur.close()
         tables(id)
@@ -414,19 +418,23 @@ def removediscount(id):
 @app.route('/tables/discount/<string:id>/', methods = ["GET", "POST"])
 @is_logged_in
 def discount(id):
-        
+        cur = mysql.connection.cursor() 
         form = DiscountForm(request.form)
         discountCode = form.discountCode.data
-        discount = form.discount.data
-        if len(discountCode) != 15: #Potentially have a database with a bunch of valid discount codes in that this can check against in the future.
-                flash('Discount not applied. Not a valid discount code!','danger')
+        cur.execute(("SELECT * FROM discounts WHERE discount_code = '{0}' and used = 0").format(discountCode))
+        result = cur.fetchone()
+        print(result)
+        if str(result) =='None': #Potentially have a database with a bunch of valid discount codes in that this can check against in the future.
+                flash('Discount not applied. Code has been used or it is not valid.','danger')
         else:
-                cur = mysql.connection.cursor() 
+                discount = result['discount_type']
                 cur.execute(("UPDATE tables set discountCode = '{0}', discountType = {1} WHERE (table_id = {2});").format(discountCode,discount,id))
                 cur.execute(("SELECT * FROM tables WHERE table_id = {0}").format(id))
                 tablesDict = cur.fetchone()
                 cur.execute(("SELECT SUM(subtotal) AS total FROM order_item, product, sub_category WHERE order_id = '{0}' AND table_id = {1} and order_item.product_id = product.product_id and product.subcategory_id = sub_category.subcategory_id and sub_category.subcategory_id > 7").format(tablesDict['order_id'],id))
                 price = cur.fetchone()
+                if result['manager_code'] == 0:
+                        cur.execute(("UPDATE discounts set used = 1 WHERE discount_code = '{0}'").format(discountCode))
                 try:
                         if int(discount) == 8:
                                 cur.execute(("UPDATE TABLES SET discountAmount = {0}, serviceApplied = 0, discountMessage = '{1}' WHERE table_id = {2}").format(tablesDict['total'],"100% off Bill",id))
@@ -437,7 +445,7 @@ def discount(id):
                         elif int(discount) == 5:
                                 cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.5,"50% off Food",id))     
                         elif int(discount) == 4:
-                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(tablesDict['total'])*0.25,"25% off Food",id))
+                                cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(tablesDict['total'])*0.25,"25% off Bill",id))
                         elif int(discount) == 3:
                                 cur.execute(("UPDATE TABLES SET discountAmount = {0}, discountMessage = '{1}' WHERE table_id = {2}").format(float(price['total'])*0.3,"30% off Food",id))
                         elif int(discount) == 2:

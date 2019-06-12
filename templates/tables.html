@@ -50,16 +50,16 @@
                     <a class="btn btn-block btn-danger" href="/tables/closetable/{{id}}/">Close Table</a>
                     <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')" value="Print Bill">
 
-                    {% if tables.discountType > 0 %}
-                        <h4 class="float-right"> {{tables.discountMessage}} Discount: £{{tables.discountAmount}}</h4>
-                    {% endif %}
 
-
-                    <br>
                     <br>
                     {% if tables.serviceApplied == 1 %}
                     <h3 class="float-right">Total Bill £{{tables.total}}</h3>
                     {% endif %}         
+
+                    {% if tables.discountType > 0 %}
+                        <h4 class="float-right"> {{tables.discountMessage}} Discount: -£{{tables.discountAmount}}</h4>
+                    {% endif %}
+
                 </div>
             </div>
             <hr>
@@ -190,7 +190,7 @@
         <br>
         <br>   
         {% if tables.discountType > 0 %}
-        <h4 class="float-right"> {{tables.discountMessage}} Discount: £{{tables.discountAmount}}</h4>   
+        <h4 class="float-right"> {{tables.discountMessage}} Discount: -£{{tables.discountAmount}}</h4>   
         {% endif %}
         <br>
         <br>

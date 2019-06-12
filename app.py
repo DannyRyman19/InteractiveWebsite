@@ -151,7 +151,6 @@ def tables(id):
         cur.execute(("SELECT covers FROM tables WHERE table_id = {0};").format(id))
         covers = cur.fetchone()
         form.covers.process_data(covers['covers'])
-
         for i in range(1,6):
                 cur.execute(("SELECT sum(product_variation.price) AS price, product.name, order_item.message, product.product_id, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} and sub_category.category_id = {2} GROUP BY product.name, order_item.message, product.product_id;").format(order_id, id,i))
                 if i == 1:
@@ -479,7 +478,7 @@ def service(id,service):
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
-        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode, tables.discountMessage FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
+        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode, tables.discountMessage, tables.service, tables.totalservice FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
         results = cur.fetchone()
         if str(results) != "None":
                 covers =int(results['covers'])
@@ -492,12 +491,14 @@ def close_table(id):
                 discountCode = results['discountCode']
                 discountType = results['discountType']
                 discountMessage = results['discountMessage']
+                totalservice = results['totalservice']
+                service = results['service']
                 if str(discountCode) == 'None':
                         if str(discountType) == 'None':
                                 discountCode = ''
                                 discountMessage = ''
                                 discountType = 0
-                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType, discountMessage) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}','{9}')").format(covers,table_id,subtotal,order_id,date,serviceApplied,discountAmount, discountCode, discountType, discountMessage))
+                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType, discountMessage,service, totalservice) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}','{9}',{10},{11})").format(covers,table_id,subtotal,order_id,date,serviceApplied,discountAmount, discountCode, discountType, discountMessage,service,totalservice))
         cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00, serviceApplied = 0, discountCode = NULL, discountType = 0, discountAmount = 0.00, discountMessage = NULL WHERE table_id = {0};").format(id))
         mysql.connection.commit()
         cur.close()

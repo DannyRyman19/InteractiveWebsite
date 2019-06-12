@@ -4,13 +4,21 @@
 
     
         <h1>Table Number {{id}}<div class="float-right">Seats:{{history.covers}}</div></h1>
-        {{order_id}} 
         
         <p>Date Opened: {{history.date_opened}}</p>
         <p>Date Closed: {{history.date_closed}}</p>
-        
         <hr>
-            <div class="float-right"><h2>Total Bill £{{history.total}}</h2></div>
+        <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')" value="Print Bill">
+        <script>
+            function printDiv(divName) {
+                var printContents = document.getElementById(divName).innerHTML;
+                var originalContents = document.body.innerHTML;
+                document.body.innerHTML = printContents;
+                window.print();
+
+                document.body.innerHTML = originalContents;
+                }
+            </script>
             <script>
                 $(document).ready( function () {
                   $('#all').DataTable();
@@ -30,13 +38,116 @@
               $(document).ready( function () {
                   $('#Desserts').DataTable();
               } );
-            </script>
+            </script>   
+    
+{% if history.serviceApplied == 1 %}
+<h3 class="float-right">Total Bill £{{history.total}}</h3>
+{% endif %}  
+<br>
+<br>
 
-   
-    <div>
-            
-    </div>
+{% if history.discountType > 0 %}
+    <h4 class="float-right"> {{history.discountMessage}} Discount: -£{{history.discountAmount}}</h4>
+{% endif %}       
+<br>
 
+<hr>
+{% if history.serviceApplied == 1 %}
+<h2 class="float-right">Total Bill + 10% Service: £{{history.totalservice}}</h2>
+{% else %}
+<h2 class="float-right">Total Bill £{{history.total}}</h2>
+{% endif %}
+<h4>Bill ID: {{order_id}}</h4>
+<div id="printableArea" style="display:none; align-content: center;">
+    <table class="table table-striped">
+        
+        <H1 style="align-content: center">Restaurant Name</H1>
+        <h4>Tel: 01234 567890</h4>
+        
+        
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                        {% for drink in drinks %}
+                    
+                    <tr>
+                            <td>{{drink.quantity}}</td>
+                            <td>{{drink.name}}</td>
+                            <td>{{drink.price}}</td>
+                            <td>{{drink.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for starter in starters %}
+                    
+                    <tr>
+                            <td>{{starter.quantity}}</td>
+                            <td>{{starter.name}}</td>
+                            <td>{{starter.price}}</td>
+                            <td>{{starter.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for main in mains %}
+                    
+                    <tr>
+                            <td>{{main.quantity}}</td>
+                            <td>{{main.name}}</td>
+                            <td>{{main.price}}</td>
+                            <td>{{main.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for side in sides %}
+                    
+                    <tr>
+                            <td>{{side.quantity}}</td>                            
+                            <td>{{side.name}}</td>
+                            <td>{{side.price}}</td>
+                            <td>{{side.subtotal}}</td>
+                        </tr>
+                        
+                        {% endfor %}
+
+                        {% for dessert in desserts %}
+                    
+                        <tr>
+                            <td>{{dessert.quantity}}</td>
+                            <td>{{dessert.name}}</td>
+                            <td>{{dessert.price}}</td>
+                            <td>{{dessert.subtotal}}</td>
+                            {% endfor %}
+                        </tr>   
+    </table>
+    <br>
+    <br> 
+
+    {% if history.serviceApplied == 1 %} 
+        <div style="text-align:right">
+        <h4>Subtotal: £{{history.total}}</h4>   
+        <h4 >10% Service: £{{history.service}}</h4> 
+        {% if history.discountType > 0 %}
+        <h4 class="float-right"> {{history.discountMessage}} Discount: -£{{history.discountAmount}}</h4>   
+        {% endif %}
+        <br>
+        <br> 
+        <h1>Total: £{{history.totalservice}}</h1>   
+        <p>Bill Number: {{history.order_id}}</p></div>
+    {% else %}
+        <br>
+        <h1 class="float-right">Total: £{{history.total}}</h1>  
+        {% if history.discountType > 0 %}
+        <h4 class="float-right"> {{history.discountMessage}} Discount: -£{{history.discountAmount}}</h4>   
+        {% endif %} 
+        <p>Bill Number: {{history.order_id}}</p>
+    {% endif %}
+</div>
    
     <h3>All Items</h3>
     <table id ="all" class="table table-striped table-bordered" cellspacing="0" width="100%">

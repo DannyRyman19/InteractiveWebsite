@@ -115,7 +115,6 @@
         <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
         <hr>    
         
-            <div class="float-right"><h2>Total Bill £0.00</h2></div><a class="btn btn-primary" href="/tables/opentable/{{id}}/">Open Table</a>
     {% endif %}
     <div>
         
@@ -206,7 +205,7 @@
             <p>Bill Number: {{tables.order_id}}</p>
         {% endif %}
     </div>
-   
+   {% if tables.active != 0 %}
     <h3>All Items</h3>
     <table id ="all" class="table table-striped table-bordered" cellspacing="0" width="100%">
             <thead>
@@ -530,6 +529,11 @@
                     
                 </tbody>   
     </table>
+    {% else %}
+    <center><a class="btn btn-primary btn-block" style="height:120px;" href="/tables/opentable/{{id}}/"><br><h1>Open Table</h1></a></center>
+    <hr>
+
+    {% endif %}
 
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" role="dialog">
@@ -549,9 +553,7 @@
                             <input type="hidden" name="_method" value="DELETE">
                             <input type="submit" value="Delete" class="btn btn-danger">
                             <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
-        
                     </form>
-                    
             </div>
           </div>
           

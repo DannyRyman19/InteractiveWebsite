@@ -2,16 +2,25 @@
 
 {% block body %}
     <h1>Daily Summary</h1>
-    <p>Date: <input type="text" id="datepicker" value="{{displayDate}}"></p>
+    <p>Date: <input type="text" id="datepicker" value=""></p>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
-            $( function() {
-              $( "#datepicker" ).datepicker();
+            $(function () {
+            $("#datepicker").datepicker({
+                dateFormat: "yy-mm-dd",
+                onSelect: function () {
+                var dateObject = $(this).datepicker('getDate'); 
+                window.history.replaceState({}, document.title, "/daily_summary/"  + this.value);
+                location.reload();
+        }
+    });
+});
 
-            } );
     </script>
+
+    
     <h3 class="float-right"><small>Welcome {{session.name}}</small></h3>
     <hr>
     <script>

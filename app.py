@@ -114,12 +114,11 @@ def individual_bill_history(order_id):
         return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, total = total, order_id = order_id)
 
 #Daily Summary
-@app.route('/daily_summary')
+@app.route('/daily_summary/<string:date>')
 @is_logged_in
 @is_manager
-def daily_summary():
+def daily_summary(date):
         from datetime import datetime
-        date = datetime.today().strftime('%Y-%m-%d')
         displayDate = datetime.today().strftime('%d-%m-%y')
         cur = mysql.connection.cursor()
         cur.execute(("SELECT COUNT(*) FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
@@ -347,17 +346,17 @@ def update_order(id, order_id, product_id, price):
                         stock = stock['stock']
                         if int(stock) - quantity > 0:
                                 if int(result) > 0 :
-                                        cur.execute(("UPDATE order_item SET quantity = {0}, subtotal=({1} * {2}), last_order_time = NOW(), message = '{3}'  WHERE table_id = {4} and product_id = {5} and order_id = '{6}' ").format(quantity, price, quantity,message,id, product_id,order_id))
+                                        cur.execute(("UPDATE order_item SET quantity = {0}, subtotal=({1} * {2}), last_order_time = NOW(), message = '{3}'  WHERE table_id = {4} and product_id = {5} and order_id = '{6}' ").format(quantity, price, quantity,message,id, product_id,order_id)) #already ordered before
                                 else:
-                                        cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id))
+                                        cur.execute(("INSERT INTO  order_item(order_id, table_id, quantity, subtotal, product_id, last_order_time)  VALUES('{0}',{1},{2},{3},{4},NOW())").format(order_id, id, quantity, int(quantity) * price, product_id)) # new order
                         
-                                cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id))
+                                cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id)) #change stock quantity
                                 mysql.connection.commit()
                                 cur.close()
-                        else:
+                        else: # no stock
                                 tables(id)
                                 flash(('Not enough stock! Current stock {0}').format(stock),'danger')
-                elif quantity == 0:
+                elif quantity == 0:     #Delete order from table
 
                         remove_order(product_id,order_id,id)
                 return redirect(url_for('tables', id = id))
@@ -511,7 +510,7 @@ class TableForm(Form):
         covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6'),('7','7'),('8','8'),('9','9'),('10','10'),('11','11'),('12','12'),('13','13'),('14','14'),('15','15')])
 
 class DiscountForm(Form):
-        discount = SelectField('Apply Discount', choices=[('1','10% off Food'),('2','20% off Food'),('3','30% off Food'),('4','25% off bill'),('5','50% off Food'),('6','10% off Bill'),('7','20% off bill'),('8','100% Discount')])     
+        discount = SelectField('Apply Discount', choices=[('1','10% off Food'),('2','20% off Food'),('3','30% off Food'),('4','25% off Bill'),('5','50% off Food'),('6','10% off Bill'),('7','20% off Bill'),('8','100% Discount')])     
         discountCode = TextAreaField('Discount Code:')
 
 @app.route('/')
@@ -548,13 +547,9 @@ def add_product():
                 stock = form.stock.data
                 cur = mysql.connection.cursor()
                 cur.execute("INSERT INTO product (name, description, subcategory_id) VALUES (%s, %s, %s)",(name,description,subcategory_id))
-                mysql.connection.commit()
-       
                 cur.execute("INSERT INTO product_variation (product_id, price, stock) VALUES (LAST_INSERT_ID(),%s, %s)",(price,stock))
                 mysql.connection.commit()
-               
                 cur.close()
-
                 flash('Product Created!', 'success')
 
                 return redirect(url_for('stock_management'))
@@ -581,7 +576,6 @@ def edit_product(product_id):
         form.category_id.process_data(product['category_id'])
         form.stock.data = product['stock']
      
-
         if request.method == "POST" and form.validate():
                 name = request.form['name']
                 description = request.form['description']
@@ -591,9 +585,6 @@ def edit_product(product_id):
                 stock = request.form['stock']
                 cur = mysql.connection.cursor()
                 cur.execute("UPDATE product SET name=%s, description=%s, subcategory_id=%s WHERE product.product_id = %s", (name, description, subcategory_id, product_id))
-                
-                mysql.connection.commit()
-
                 cur.execute("UPDATE product_variation SET price=%s, stock=%s WHERE product_id = %s", (price,  stock, product_id))
                 mysql.connection.commit()
 

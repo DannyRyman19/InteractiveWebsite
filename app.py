@@ -68,7 +68,7 @@ def kitchen():
         for table in activeTables:
                 cur.execute(("SELECT sum(product_variation.price) AS price, product.name, tables.table_id, order_item.message, product.product_id, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} GROUP BY product.name, order_item.message, product.product_id;").format(table['order_id'], table['table_id']))
                 tables.append(cur.fetchall())
-        print(tables)
+        print (tables)
         return render_template('kitchen.html', tables = tables)
 #SELECT * FROM restaurant.order_item WHERE  LIKE '%2019-05-03%' and table_id = 1;
 
@@ -118,8 +118,6 @@ def individual_bill_history(order_id):
 @is_logged_in
 @is_manager
 def daily_summary(date):
-        from datetime import datetime
-        displayDate = datetime.today().strftime('%d-%m-%y')
         cur = mysql.connection.cursor()
         cur.execute(("SELECT COUNT(*) FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
         DailyTables = cur.fetchone()
@@ -133,7 +131,7 @@ def daily_summary(date):
         cur.execute(("SELECT order_item.product_id, sum(order_item.quantity) as quantityTotal, sum(order_item.subtotal) as total, product.name FROM restaurant.order_item, restaurant.product WHERE last_order_time LIKE '%{0}%' AND order_item.product_id = product.product_id GROUP BY product.name, order_item.product_id").format(date))
         DailyItems = cur.fetchall()
         cur.close()
-        return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables, displayDate = displayDate, DailyItems= DailyItems)
+        return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables,  DailyItems= DailyItems)
 
 #tables
 @app.route('/tables/<string:id>')

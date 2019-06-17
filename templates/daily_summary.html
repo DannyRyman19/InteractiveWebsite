@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1>Daily Summary</h1>
-    <p>Date: <input type="text" id="datepicker" value=""></p>
+    <p>Date: <input type="text" id="datepicker" value="{{date}}"></p>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -25,7 +25,7 @@
     <hr>
     <script>
             $(document).ready( function () {
-          $('#example').DataTable();
+          $('#example').DataTable({paging:false});
       } );
     </script>
     <h1>Tables</h1>
@@ -47,9 +47,17 @@
         </tfoot>
         <tbody>
             <tr>
+                {% if DailyCovers == None %}
+                <td>0</td>
+                {% else %}
                 <td>{{DailyCovers}}</td>
+                {% endif %}
                 <td>{{DailyTables}}</td>
+                {% if DailyTotal == None %}
+                <td>£0.00</td>
+                {% else %}
                 <td>£{{DailyTotal}}</td>
+                {% endif %}
             </tr>
         </tbody>
     </table>

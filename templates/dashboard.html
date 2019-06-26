@@ -1,40 +1,46 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Dashboard</h1>
-    <h3><small>Welcome {{session.name}}</small><small class="float-right">Account: {{session.auth}}</small></h3>
-    <hr>
-    <script>
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, '0');
-      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-      var yyyy = today.getFullYear();
-      today = yyyy + '-' + mm + '-' + dd;
-    </script>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm">
-          <a class="btn btn-block" style="border: 2px solid rgb(226, 226, 226); height: 100px;" href="/stock_management"><br>Stock Management</a>
-        </div>
-        <div class="col-sm">
-          <a class="btn btn-block" style="background-color: orange;border: 2px solid rgb(197, 128, 0);height: 100px" href="/user_management"><br>User Management</a>
-        </div>
-        <div class="col-sm">
-          <a class="btn btn-block" style="background-color: pink; border: 2px solid rgb(228, 171, 181);height: 100px" href="/bill_history"><br>Bill History</a>
-        </div>
-      </div>
-    <br>
-      <div class="row">
-        <div class="col-sm">
-          <a class="btn btn-block" style="background-color: skyblue; border: 2px solid rgb(110, 168, 190);height: 100px" href="/restaurant_floor"><br>Floor</a>
-        </div>
-        <div class="col-sm">
-          <a class="btn btn-block" style="background-color: gold; border: 2px solid rgb(209, 178, 2);height: 100px" href="/daily_summary/" onclick="location.href=this.href+today;return false;"><br>Daily Summary</a>
-        </div>
-        <div class="col-sm">
-          <a class="btn btn-block" style="background-color: burlywood; border: 2px solid rgb(192, 160, 118);height: 100px" href="/kitchen"><br>Kitchen</a>
-        </div>
-      </div>
+<h1>Dashboard</h1>
+<h3><small>Welcome {{session.name}}</small><small class="float-right">Account: {{session.auth}}</small></h3>
+<hr>
+<script>
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+  var yyyy = today.getFullYear();
+  today = yyyy + '-' + mm + '-' + dd;
+</script>
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <a class="btn btn-block" style="border: 2px solid rgb(226, 226, 226); height: 100px;"
+        href="/stock_management"><br>Stock Management</a>
     </div>
-    <hr>
+    <div class="col-sm">
+      <a class="btn btn-block" style="background-color: orange;border: 2px solid rgb(197, 128, 0);height: 100px"
+        href="/user_management"><br>User Management</a>
+    </div>
+    <div class="col-sm">
+      <a class="btn btn-block" style="background-color: pink; border: 2px solid rgb(228, 171, 181);height: 100px"
+        href="/bill_history"><br>Bill History</a>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm">
+      <a class="btn btn-block" style="background-color: skyblue; border: 2px solid rgb(110, 168, 190);height: 100px"
+        href="/restaurant_floor"><br>Floor</a>
+    </div>
+    <div class="col-sm">
+      <a class="btn btn-block" style="background-color: gold; border: 2px solid rgb(209, 178, 2);height: 100px"
+        href="/daily_summary/" onclick="location.href=this.href+today;return false;"><br>Daily Summary</a>
+    </div>
+    <div class="col-sm">
+      <a class="btn btn-block" style="background-color: burlywood; border: 2px solid rgb(192, 160, 118);height: 100px"
+        href="/kitchen"><br>Kitchen</a>
+    </div>
+  </div>
+</div>
+<hr>
 {% endblock %}

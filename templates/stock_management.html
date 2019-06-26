@@ -1,305 +1,326 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-     <script>
-              $(document).ready( function () {
-                  $('#drinks').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#starters').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#Mains').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#Sides').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#Desserts').DataTable();
-              } );
-     </script>
-    <h1>Stock Management</h1>
-    <h3><small>Welcome {{session.name}}</small></h3>
-    <hr>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3">
-                <a class="btn btn-block btn-success" href="/add_product?type=1">Add Drink</a>
-            </div>
-            <div class="col-lg-3">
-                <a class="btn btn-block btn-success" href="/add_product?type=2">Add Starter</a>
-            </div>
-            <div class="col-lg-3">
-                <a class="btn btn-block btn-success" href="/add_product?type=3">Add Main</a>
-            </div>
-            <div class="col-lg-3">
-                <a class="btn btn-block btn-success" href="/add_product?type=4">Add Side</a>
-            </div>
-            <br>
-            <br>
-            <div class="col-lg-4">
-            </div>
-                      
-            <div class="col-lg-4">
-                    <a class="btn btn-block btn-success" href="/add_product?type=5">Add Dessert</a>
-            </div>
-            <div class="col-lg-4">
-            </div>  
+<script>
+    $(document).ready(function () {
+        $('#drinks').DataTable();
+    });
+    $(document).ready(function () {
+        $('#starters').DataTable();
+    });
+    $(document).ready(function () {
+        $('#Mains').DataTable();
+    });
+    $(document).ready(function () {
+        $('#Sides').DataTable();
+    });
+    $(document).ready(function () {
+        $('#Desserts').DataTable();
+    });
+</script>
+<h1>Stock Management</h1>
+<h3><small>Welcome {{session.name}}</small></h3>
+<hr>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3">
+            <a class="btn btn-block btn-success" href="/add_product?type=1">Add Drink</a>
+        </div>
+        <div class="col-lg-3">
+            <a class="btn btn-block btn-success" href="/add_product?type=2">Add Starter</a>
+        </div>
+        <div class="col-lg-3">
+            <a class="btn btn-block btn-success" href="/add_product?type=3">Add Main</a>
+        </div>
+        <div class="col-lg-3">
+            <a class="btn btn-block btn-success" href="/add_product?type=4">Add Side</a>
+        </div>
+        <br>
+        <br>
+        <div class="col-lg-4">
+        </div>
+
+        <div class="col-lg-4">
+            <a class="btn btn-block btn-success" href="/add_product?type=5">Add Dessert</a>
+        </div>
+        <div class="col-lg-4">
         </div>
     </div>
-    <hr>
-    <h1>Drinks</h1> 
-    <table id ="drinks" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                </tfoot>
-                <tbody>
-                        {% for drink in drinks %}
-                        <tr>  
-                            <td>{{drink.product_id}}</td>
-                            <td>{{drink.name}}</td>
-                            <td>{{drink.price}}</td>
-                            <td>{{drink.stock}}</td>
-                            <td><a href="edit_product/{{drink.product_id}}" class="btn btn-block" style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a></td>
-                            <td>
-                                <form action="{{url_for('delete_product',id=drink.product_id)}}" method="POST">
-                                    <button type="button" onclick="document.getElementById('deleteForm').action = '/delete_product/{{drink.product_id}}';" class="btn btn-block" style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);" data-toggle="modal" data-target="#myModal">X</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                </tbody>   
-    </table>
-    <br>
-    <a class="btn btn-block btn-success float-right" href="/add_product?type=1">Add Drink</a>
-     <br>
-     <br>
+</div>
+<hr>
+<h1>Drinks</h1>
+<table id="drinks" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock Count</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock Count</th>
+        <th></th>
+        <th></th>
+    </tfoot>
+    <tbody>
+        {% for drink in drinks %}
+        <tr>
+            <td>{{drink.product_id}}</td>
+            <td>{{drink.name}}</td>
+            <td>{{drink.price}}</td>
+            <td>{{drink.stock}}</td>
+            <td><a href="edit_product/{{drink.product_id}}" class="btn btn-block"
+                    style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a>
+            </td>
+            <td>
+                <form action="{{url_for('delete_product',id=drink.product_id)}}" method="POST">
+                    <button type="button"
+                        onclick="document.getElementById('deleteForm').action = '/delete_product/{{drink.product_id}}';"
+                        class="btn btn-block"
+                        style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);"
+                        data-toggle="modal" data-target="#myModal">X</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+<a class="btn btn-block btn-success float-right" href="/add_product?type=1">Add Drink</a>
+<br>
+<br>
 
-    
-    <hr>
-    <h1>Starters</h1>
-    <table id ="starters" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                </tfoot>
-                <tbody>
-                        {% for starter in starters %}
-                    <tr id="starter{{starter.product_id}}">
-                    
-                        <td>{{starter.product_id}}</td>
-                        <td>{{starter.name}}</td>
-                        <td>{{starter.price}}</td>
-                        <td>{{starter.stock}}</td>
-                        <td><a href="edit_product/{{starter.product_id}}" class="btn btn-block" style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a></td>
-                        <td>
-                        <form action="{{url_for('delete_product',id=starter.product_id)}}" method="POST">
-                        <button type="button" onclick="document.getElementById('deleteForm').action = '/delete_product/{{starter.product_id}}';" class="btn btn-block" style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);" data-toggle="modal" data-target="#myModal">X</button>
+
+<hr>
+<h1>Starters</h1>
+<table id="starters" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock Count</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock Count</th>
+        <th></th>
+        <th></th>
+    </tfoot>
+    <tbody>
+        {% for starter in starters %}
+        <tr id="starter{{starter.product_id}}">
+
+            <td>{{starter.product_id}}</td>
+            <td>{{starter.name}}</td>
+            <td>{{starter.price}}</td>
+            <td>{{starter.stock}}</td>
+            <td><a href="edit_product/{{starter.product_id}}" class="btn btn-block"
+                    style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a>
+            </td>
+            <td>
+                <form action="{{url_for('delete_product',id=starter.product_id)}}" method="POST">
+                    <button type="button"
+                        onclick="document.getElementById('deleteForm').action = '/delete_product/{{starter.product_id}}';"
+                        class="btn btn-block"
+                        style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);"
+                        data-toggle="modal" data-target="#myModal">X</button>
                 </form>
             </td>
             {% endfor %}
         </tr>
-        </tbody>   
-    </table>
-    <br>
-    <a class="btn btn-block btn-success float-right" href="/add_product?type=2">Add Starter</a>
-    <br>
-    <br>
-    <hr>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-block btn-success float-right" href="/add_product?type=2">Add Starter</a>
+<br>
+<br>
+<hr>
 
-    <h1>Mains</h1>
-    <table id ="Mains" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                </tfoot>
-                <tbody>
-                        {% for main in mains %}
-                        <tr>
-                        <td>{{main.product_id}}</td>
-                        <td>{{main.name}}</td>
-                        <td>{{main.price}}</td>
-                        <td>{{main.stock}}</td>
-                        <td><a href="edit_product/{{main.product_id}}" class="btn btn-block" style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a></td>
-                        <td>
-                        <form action="{{url_for('delete_product',id=main.product_id)}}" method="POST">
-                        <button type="button" onclick="document.getElementById('deleteForm').action = '/delete_product/{{main.product_id}}';" class="btn btn-block" style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);" data-toggle="modal" data-target="#myModal">X</button>
-                    </form>
-                </td>
-            </tr>
+<h1>Mains</h1>
+<table id="Mains" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock Count</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock Count</th>
+        <th></th>
+        <th></th>
+    </tfoot>
+    <tbody>
+        {% for main in mains %}
+        <tr>
+            <td>{{main.product_id}}</td>
+            <td>{{main.name}}</td>
+            <td>{{main.price}}</td>
+            <td>{{main.stock}}</td>
+            <td><a href="edit_product/{{main.product_id}}" class="btn btn-block"
+                    style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a>
+            </td>
+            <td>
+                <form action="{{url_for('delete_product',id=main.product_id)}}" method="POST">
+                    <button type="button"
+                        onclick="document.getElementById('deleteForm').action = '/delete_product/{{main.product_id}}';"
+                        class="btn btn-block"
+                        style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);"
+                        data-toggle="modal" data-target="#myModal">X</button>
+                </form>
+            </td>
+        </tr>
         {% endfor %}
-        
-        </tr>
-        </tbody>   
-    </table>
-    <br>
-    <a class="btn btn-block btn-success float-right" href="/add_product?type=3">Add Main</a>
-    <br>
-    <br>
-    <hr>   
-    <h1>Sides</h1>
-    <table id ="Sides" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                </tfoot>
-                <tbody>
-                        {% for side in sides %}
-                        <tr>
-                        <td>{{side.product_id}}</td>
-                        <td>{{side.name}}</td>
-                        <td>{{side.price}}</td>
-                        <td>{{side.stock}}</td>
-                        <td><a href="edit_product/{{side.product_id}}" class="btn btn-block" style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a></td>
-                        <td>
-                        <form action="{{url_for('delete_product',id=side.product_id)}}" method="POST">
-                        <button type="button" onclick="document.getElementById('deleteForm').action = '/delete_product/{{side.product_id}}';" class="btn btn-block" style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);" data-toggle="modal" data-target="#myModal">X</button>
-                        </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tr>
-        </tbody>   
-    </table>
-    <br>
-    <a class="btn btn-block btn-success float-right" href="/add_product?type=4">Add Side</a>
-    <br>
-    <br>   
 
-    <hr>
-    <h1>Desserts</h1>
-    <table id ="Desserts" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock Count</th>
-                        <th></th>
-                        <th></th>
-                </tfoot>
-                <tbody>
-                        {% for dessert in desserts %}
-                        <tr>
-                            <td>{{dessert.product_id}}</td>
-                            <td>{{dessert.name}}</td>
-                            <td>{{dessert.price}}</td>
-                            <td>{{dessert.stock}}</td>
-                        
-                            <td><a href="edit_product/{{dessert.product_id}}" class="btn btn-block" style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a></td>
-                            <td>
-                                    <form action="{{url_for('delete_product',id=dessert.product_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/delete_product/{{dessert.product_id}}';" class="btn btn-block" style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);" data-toggle="modal" data-target="#myModal">X</button>
-                
-                    
-                                    </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        
         </tr>
-        </tbody>   
-    </table>
-    <br>    
-    <a class="btn btn-block btn-success float-right" href="/add_product?type=5">Add Dessert</a>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-block btn-success float-right" href="/add_product?type=3">Add Main</a>
+<br>
+<br>
+<hr>
+<h1>Sides</h1>
+<table id="Sides" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock Count</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock Count</th>
+        <th></th>
+        <th></th>
+    </tfoot>
+    <tbody>
+        {% for side in sides %}
+        <tr>
+            <td>{{side.product_id}}</td>
+            <td>{{side.name}}</td>
+            <td>{{side.price}}</td>
+            <td>{{side.stock}}</td>
+            <td><a href="edit_product/{{side.product_id}}" class="btn btn-block"
+                    style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a>
+            </td>
+            <td>
+                <form action="{{url_for('delete_product',id=side.product_id)}}" method="POST">
+                    <button type="button"
+                        onclick="document.getElementById('deleteForm').action = '/delete_product/{{side.product_id}}';"
+                        class="btn btn-block"
+                        style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);"
+                        data-toggle="modal" data-target="#myModal">X</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tr>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-block btn-success float-right" href="/add_product?type=4">Add Side</a>
+<br>
+<br>
+<hr>
+<h1>Desserts</h1>
+<table id="Desserts" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock Count</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock Count</th>
+        <th></th>
+        <th></th>
+    </tfoot>
+    <tbody>
+        {% for dessert in desserts %}
+        <tr>
+            <td>{{dessert.product_id}}</td>
+            <td>{{dessert.name}}</td>
+            <td>{{dessert.price}}</td>
+            <td>{{dessert.stock}}</td>
 
+            <td><a href="edit_product/{{dessert.product_id}}" class="btn btn-block"
+                    style="background-color: rgb(0, 156, 218);color: white;border: 2px solid rgb(0, 48, 153);">Edit</a>
+            </td>
+            <td>
+                <form action="{{url_for('delete_product',id=dessert.product_id)}}" method="POST">
+                    <button type="button"
+                        onclick="document.getElementById('deleteForm').action = '/delete_product/{{dessert.product_id}}';"
+                        class="btn btn-block"
+                        style="background-color: rgb(255, 0, 0);color: white;border: 2px solid rgb(153, 0, 0);"
+                        data-toggle="modal" data-target="#myModal">X</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tr>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-block btn-success float-right" href="/add_product?type=5">Add Dessert</a>
+<br>
+<br>
+<br>
+<br>
+<br>
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
 
- <!-- Modal -->
- <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
-        
-          <!-- Modal content-->
-          <div class="modal-content">
+        <!-- Modal content-->
+        <div class="modal-content">
             <div class="modal-header">
                 <h3>Delete Product</h3>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
-              <p>Are you sure you want to delete this product?</p>
+                <p>Are you sure you want to delete this product?</p>
             </div>
             <div class="modal-footer">
-                    <form id="deleteForm" action="" method="POST">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <input type="submit" value="Delete" class="btn btn-danger">
-                            <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
-        
-                    </form>
-                    
+                <form id="deleteForm" action="" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="submit" value="Delete" class="btn btn-danger">
+                    <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
+                </form>
             </div>
-          </div>
-          
         </div>
-      </div>
-      
+    </div>
+</div>
+
 {% endblock %}

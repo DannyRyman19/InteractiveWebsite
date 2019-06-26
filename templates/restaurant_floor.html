@@ -1,44 +1,71 @@
 {% extends 'layout.html' %}
 {% block body %}
-        
+
 <center>
     <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
-         <a href="/tables/1"><rect id="1" height="100" width="100" y="25" x="5" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/2"><rect  id="2" height="100" width="100" y="175" x="5" stroke-width="3" stroke="#000" fill="#0000FF"/></a>         
-         <a href="/tables/3"><rect id="3" height="100" width="100" y="325" x="5" stroke-width="3" stroke="#000" fill="#0000FF"/></a>        
-         <a href="/tables/4"><rect id="4" height="100" width="100" y="475" x="5" stroke-width="3" stroke="#000" fill="#0000FF"/></a>         
-         <a href="/tables/5"><rect id="5" height="100" width="100" y="475" x="155" stroke-width="3" stroke="#000" fill="#0000FF"/></a>        
-         <a href="/tables/6"><rect id="6" height="100" width="100" y="475" x="305" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/7"><rect id="7" height="100" width="100" y="475" x="455" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/8"><rect id="8" height="100" width="100" y="325" x="455" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/9"><rect id="9" height="100" width="100" y="175" x="455" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/10"><rect id="10" height="100" width="100" y="25" x="455" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/11"><rect id="11" height="100" width="100" y="25" x="305" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/12"><rect id="12" height="100" width="100" y="25" x="155" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/20"><rect id="20" height="130" width="130" y="225" x="225" stroke-opacity="null" stroke-width="3" stroke="#000" fill="#0000FF"/></a>
-         <a href="/tables/1"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_25" y="90" x="40" fill="#ffffff">1</text></a>        
-         <a href="/tables/2"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_26" y="240" x="40" fill="#ffffff">2</text></a>
-         <a href="/tables/3"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_27" y="390" x="40" fill="#ffffff">3</text></a>
-         <a href="/tables/4"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_28" y="540" x="40" fill="#ffffff">4</text></a>
-         <a href="/tables/5"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_29" y="540" x="190" fill="#ffffff">5</text></a>
-         <a href="/tables/6"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_30" y="540" x="340" fill="#ffffff">6</text></a>
-         <a href="/tables/7"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_31" y="540" x="490" fill="#ffffff">7</text></a>
-         <a href="/tables/8"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_32" y="390" x="490" fill="#ffffff">8</text></a>
-         <a href="/tables/9"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_33" y="240" x="490" fill="#ffffff">9</text></a>
-         <a href="/tables/10"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_34" y="90" x="480" fill="#ffffff">10</text></a>
-         <a href="/tables/11"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_35" y="90" x="330" fill="#ffffff">11</text></a>
-         <a href="/tables/12"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_36" y="90" x="180" fill="#ffffff">12</text></a>
-         <a href="/tables/20"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="47" id="svg_37" y="305" x="265" fill="#ffffff">20</text></a>
-       </svg>
-       {% for table in tables %}
-       {% if table.active == 1 %}
-           <script>
-                   document.getElementById("{{table.table_id}}").style.fill = "#008000";
-                   console.log('{{table.table_id}}')
-           </script>
-       {% endif %}
-   {% endfor %}
-  
+        <a href="/tables/1">
+            <rect id="1" height="100" width="100" y="25" x="5" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/2">
+            <rect id="2" height="100" width="100" y="175" x="5" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/3">
+            <rect id="3" height="100" width="100" y="325" x="5" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/4">
+            <rect id="4" height="100" width="100" y="475" x="5" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/5">
+            <rect id="5" height="100" width="100" y="475" x="155" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/6">
+            <rect id="6" height="100" width="100" y="475" x="305" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/7">
+            <rect id="7" height="100" width="100" y="475" x="455" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/8">
+            <rect id="8" height="100" width="100" y="325" x="455" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/9">
+            <rect id="9" height="100" width="100" y="175" x="455" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/10">
+            <rect id="10" height="100" width="100" y="25" x="455" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/11">
+            <rect id="11" height="100" width="100" y="25" x="305" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/12">
+            <rect id="12" height="100" width="100" y="25" x="155" stroke-width="3" stroke="#000" fill="#0000FF" /></a>
+        <a href="/tables/20">
+            <rect id="20" height="130" width="130" y="225" x="225" stroke-opacity="null" stroke-width="3" stroke="#000"
+                fill="#0000FF" /></a>
+        <a href="/tables/1"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_25" y="90" x="40" fill="#ffffff">1</text></a>
+        <a href="/tables/2"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_26" y="240" x="40" fill="#ffffff">2</text></a>
+        <a href="/tables/3"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_27" y="390" x="40" fill="#ffffff">3</text></a>
+        <a href="/tables/4"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_28" y="540" x="40" fill="#ffffff">4</text></a>
+        <a href="/tables/5"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_29" y="540" x="190" fill="#ffffff">5</text></a>
+        <a href="/tables/6"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_30" y="540" x="340" fill="#ffffff">6</text></a>
+        <a href="/tables/7"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_31" y="540" x="490" fill="#ffffff">7</text></a>
+        <a href="/tables/8"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_32" y="390" x="490" fill="#ffffff">8</text></a>
+        <a href="/tables/9"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_33" y="240" x="490" fill="#ffffff">9</text></a>
+        <a href="/tables/10"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_34" y="90" x="480" fill="#ffffff">10</text></a>
+        <a href="/tables/11"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_35" y="90" x="330" fill="#ffffff">11</text></a>
+        <a href="/tables/12"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_36" y="90" x="180" fill="#ffffff">12</text></a>
+        <a href="/tables/20"><text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif"
+                font-size="47" id="svg_37" y="305" x="265" fill="#ffffff">20</text></a>
+    </svg>
+    {% for table in tables %}
+    {% if table.active == 1 %}
+    <script>
+        document.getElementById("{{table.table_id}}").style.fill = "#008000";
+        console.log('{{table.table_id}}')
+    </script>
+    {% endif %}
+    {% endfor %}
+
 </center>
 
 

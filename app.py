@@ -22,7 +22,7 @@ def is_logged_in(f):
                 if 'logged_in' in session:
                         return f(*args, **kwargs)
                 else:
-                        flash("You must be logged in to access this ßpage", 'danger')
+                        flash("You must be logged in to access this page", 'danger')
                         return redirect(url_for('login'))
         return wrap
 #manager check - checks if the logged in user is a manager, managers can access stock management and user management.
@@ -63,12 +63,11 @@ def kitchen():
         cur = mysql.connection.cursor()
         cur.execute("SELECT order_id, table_id FROM tables WHERE active = 1")
         activeTables = cur.fetchall()
-        print(activeTables)
         tables = []
         for table in activeTables:
                 cur.execute(("SELECT sum(product_variation.price) AS price, product.name, tables.table_id, order_item.message, product.product_id, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE tables.order_id = order_item.order_id and tables.order_id = '{0}' AND tables.table_id = {1} GROUP BY product.name, order_item.message, product.product_id;").format(table['order_id'], table['table_id']))
                 tables.append(cur.fetchall())
-        print (tables)
+                print (tables)
         return render_template('kitchen.html', tables = tables)
 #SELECT * FROM restaurant.order_item WHERE  LIKE '%2019-05-03%' and table_id = 1;
 
@@ -88,13 +87,11 @@ def bill_history():
 @is_logged_in
 def individual_bill_history(order_id):
         cur = mysql.connection.cursor()
-
         cur.execute(("SELECT table_id FROM order_item WHERE order_item.order_id = '{0}';").format(order_id))
         id = cur.fetchone()
         id = id['table_id']
         cur.execute(("SELECT * FROM bill_history WHERE order_id = '{0}' ORDER BY date_closed DESC").format(order_id))
         history = cur.fetchone()
-        print(history)
         for i in range(1,6):
                 cur.execute(("SELECT sum(product_variation.price) AS price, product.name, SUM(order_item.quantity) AS quantity, sum(order_item.subtotal) AS subtotal FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id WHERE  order_item.order_id = '{0}' AND order_item.table_id = {1} and sub_category.category_id = {2} GROUP BY product.name;").format(order_id, id,i))
                 if i == 1:
@@ -109,9 +106,8 @@ def individual_bill_history(order_id):
                         desserts = cur.fetchall()
         cur.execute(("SELECT SUM(subtotal) AS total FROM order_item WHERE order_id = '{0}' AND table_id = {1}").format(order_id, id))
         total = cur.fetchone()
-        total = total['total']
         cur.close()
-        return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, total = total, order_id = order_id)
+        return render_template('individual_bill_history.html', id = id, history = history, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, total = total['total'], order_id = order_id)
 
 #Daily Summary
 @app.route('/daily_summary/<string:date>')
@@ -119,19 +115,12 @@ def individual_bill_history(order_id):
 @is_manager
 def daily_summary(date):
         cur = mysql.connection.cursor()
-        cur.execute(("SELECT COUNT(*) FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
-        DailyTables = cur.fetchone()
-        DailyTables = DailyTables['COUNT(*)']
-        cur.execute(("SELECT sum(total) as DailyTotal FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
-        DailyTotal = cur.fetchone()
-        DailyTotal = DailyTotal['DailyTotal']
-        cur.execute(("SELECT sum(covers) as DailyCovers FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
-        DailyCovers = cur.fetchone()
-        DailyCovers = DailyCovers['DailyCovers']
+        cur.execute(("SELECT COUNT(*), sum(total) as DailyTotal, sum(covers) as DailyCovers  FROM restaurant.bill_history WHERE date_closed LIKE '%{0}%';").format(date))
+        Dailies = cur.fetchone()
         cur.execute(("SELECT order_item.product_id, sum(order_item.quantity) as quantityTotal, sum(order_item.subtotal) as total, product.name FROM restaurant.order_item, restaurant.product WHERE last_order_time LIKE '%{0}%' AND order_item.product_id = product.product_id GROUP BY product.name, order_item.product_id").format(date))
         DailyItems = cur.fetchall()
         cur.close()
-        return render_template('daily_summary.html', date =date, DailyTotal=DailyTotal, DailyCovers = DailyCovers, DailyTables = DailyTables,  DailyItems= DailyItems)
+        return render_template('daily_summary.html', date =date, DailyTotal=Dailies['DailyTotal'], DailyCovers = Dailies['DailyCovers'], DailyTables = Dailies['COUNT(*)'],  DailyItems= DailyItems)
 
 #tables
 @app.route('/tables/<string:id>')
@@ -175,7 +164,7 @@ def tables(id):
                 cur.execute(("UPDATE tables SET total = {0}, service = {1}, totalservice = {2} WHERE order_id = '{3}' AND table_id = {4}").format(total,service,totalservice,order_id, id))
         mysql.connection.commit()
         cur.close()
-        
+        print (tables)
         return render_template('tables.html', id = id, form = form, discountForm = discountForm, tables = tables, drinks=drinks, starters = starters, mains = mains, sides = sides, desserts = desserts, order_id = order_id)
 
 #open table
@@ -205,17 +194,16 @@ def opentable(id):
 def orderdrinks(table_id):
         
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
+        cur.execute("SELECT * FROM category INNER JOIN sub_category on category.category_id = sub_category.category_id WHERE category.category_id = 1")
         sub_categories = cur.fetchall()
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))
         order_id = cur.fetchone()
-        order_id = order_id['order_id']
         sub=[]
         for subcat in sub_categories:
-                cur.execute("SELECT * FROM product, product_variation WHERE product.subcategory_id = %s AND product.product_id = product_variation.product_id ", (str((subcat["subcategory_id"]))))
+                cur.execute(("SELECT * FROM product INNER JOIN product_variation ON product.product_id = product_variation.product_id WHERE product.subcategory_id = {0}").format((subcat["subcategory_id"])))
                 sub.append([subcat["subcategory_name"],cur.fetchall(),subcat["subcategory_id"]])
         cur.close()
-        return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id, table_id = table_id)
+        return render_template('orderdrinks.html', sub_categories = sub, order_id = order_id['order_id'], table_id = table_id)
 
 
 #add mains
@@ -225,18 +213,17 @@ def ordermains(table_id):
         
        
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 3")
+        cur.execute("SELECT * FROM category INNER JOIN sub_category on category.category_id = sub_category.category_id WHERE category.category_id = 3")
         sub_categories = cur.fetchall()
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = order_id['order_id']
         sub=[]
         for subcat in sub_categories:
-                cur.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id ").format((subcat["subcategory_id"])))
+                cur.execute(("SELECT * FROM product INNER JOIN product_variation ON product.product_id = product_variation.product_id WHERE product.subcategory_id = {0}").format((subcat["subcategory_id"])))
                 sub.append([subcat["subcategory_name"],cur.fetchall(),subcat["subcategory_id"]])
         cur.close()
 
-        return render_template('ordermains.html', sub_categories = sub, order_id = order_id, table_id = table_id)
+        return render_template('ordermains.html', sub_categories = sub, order_id = order_id['order_id'], table_id = table_id)
 
 #add starters
 @app.route('/tables/<string:table_id>/orderstarters')
@@ -244,15 +231,13 @@ def ordermains(table_id):
 def orderstarters(table_id):
         
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
+        cur.execute("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = 2")
         starters= cur.fetchall()
-        print(starters)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = order_id['order_id']
         cur.close()
 
-        return render_template('orderstarters.html', starters = starters, order_id = order_id, table_id = table_id)
+        return render_template('orderstarters.html', starters = starters, order_id = order_id['order_id'], table_id = table_id)
 
 #add sides
 @app.route('/tables/<string:table_id>/ordersides')
@@ -260,15 +245,13 @@ def orderstarters(table_id):
 def ordersides(table_id):
         
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 4 and category.category_id = 4;")
+        cur.execute("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = 4;")
         sides= cur.fetchall()
-        print(sides)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = order_id['order_id']
         cur.close()
 
-        return render_template('ordersides.html', sides = sides, order_id = order_id, table_id = table_id)
+        return render_template('ordersides.html', sides = sides, order_id = order_id['order_id'], table_id = table_id)
 
 #add desserts
 @app.route('/tables/<string:table_id>/orderdesserts')
@@ -276,15 +259,13 @@ def ordersides(table_id):
 def orderdesserts(table_id):
         
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 5 and category.category_id = 5;")
+        cur.execute("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = 5")
         desserts= cur.fetchall()
-        print(desserts)
         cur.execute(("SELECT order_id FROM tables where table_id = {0};").format(table_id))        
         order_id = cur.fetchone()
-        order_id = order_id['order_id']
         cur.close()
 
-        return render_template('orderdesserts.html', desserts = desserts, order_id = order_id, table_id = table_id)
+        return render_template('orderdesserts.html', desserts = desserts, order_id = order_id['order_id'], table_id = table_id)
 
 #add to order
 @app.route('/tables/<string:id>/add_to_order/<string:order_id>/<string:product_id>/<string:price>/', methods = ["GET", "POST"])
@@ -351,11 +332,12 @@ def update_order(id, order_id, product_id, price):
                                 cur.execute(("UPDATE product_variation SET stock = (stock + {0}) WHERE product_id = {1}").format(currentquantity-quantity,product_id)) #change stock quantity
                                 mysql.connection.commit()
                                 cur.close()
+                                tables(id)
                         else: # no stock
                                 tables(id)
                                 flash(('Not enough stock! Current stock {0}').format(stock),'danger')
                 elif quantity == 0:     #Delete order from table
-
+                        tables(id)
                         remove_order(product_id,order_id,id)
                 return redirect(url_for('tables', id = id))
                         
@@ -399,7 +381,7 @@ def covers(id):
 def removediscount(id):
         
         cur = mysql.connection.cursor() 
-        cur.execute(("SELECT discountCode from tables where table_id = {0} ").format(id))
+        cur.execute(("SELECT discountCode from tables where table_id = {0}").format(id))
         discount_code = cur.fetchone()
         discount_code = discount_code['discountCode']
         cur.execute(("UPDATE tables set discountCode = NULL, discountType = 0, discountMessage = NULL, discountAmount = 0.00 WHERE (table_id = {0});").format(id))
@@ -427,7 +409,7 @@ def discount(id):
                 cur.execute(("UPDATE tables set discountCode = '{0}', discountType = {1} WHERE (table_id = {2});").format(discountCode,discount,id))
                 cur.execute(("SELECT * FROM tables WHERE table_id = {0}").format(id))
                 tablesDict = cur.fetchone()
-                cur.execute(("SELECT SUM(subtotal) AS total FROM order_item, product, sub_category WHERE order_id = '{0}' AND table_id = {1} and order_item.product_id = product.product_id and product.subcategory_id = sub_category.subcategory_id and sub_category.subcategory_id > 7").format(tablesDict['order_id'],id))
+                cur.execute(("SELECT SUM(subtotal) AS total FROM order_item INNER JOIN product on order_item.product_id = product.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id WHERE order_id = '{0}' AND table_id = {1} and sub_category.subcategory_id > 7").format(tablesDict['order_id'],id))
                 price = cur.fetchone()
                 if result['manager_code'] == 0:
                         cur.execute(("UPDATE discounts set used = 1 WHERE discount_code = '{0}'").format(discountCode))
@@ -452,10 +434,8 @@ def discount(id):
                         cur.close()
                         tables(id)
                         flash('Discount Applied!','success')
-
                 except:
                         flash('Discount could not be applied. No items could be discounted!','danger')
-
         return redirect(url_for('tables', id = id))
 
 #Adding and removing service charge
@@ -475,28 +455,19 @@ def service(id,service):
 @is_logged_in
 def close_table(id):
         cur = mysql.connection.cursor()
-        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode, tables.discountMessage, tables.service, tables.totalservice FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id))
+        cur.execute(("SELECT order_item.order_id, tables.date, tables.covers, sum(order_item.subtotal) AS subtotal, tables.table_id, tables.serviceApplied, tables.discountAmount, tables.discountType, tables.discountCode, tables.discountMessage, tables.service, tables.totalservice FROM order_item INNER JOIN tables ON tables.table_id = order_item.table_id INNER JOIN product ON product.product_id = order_item.product_id INNER JOIN sub_category ON sub_category.subcategory_id = product.subcategory_id INNER JOIN product_variation ON product_variation.product_id = product.product_id INNER JOIN category ON category.category_id = sub_category.category_id  WHERE tables.order_id = order_item.order_id and tables.table_id = {0} GROUP BY order_item.order_id;").format(id)) #gets all information about the table
         results = cur.fetchone()
         if str(results) != "None":
-                covers =int(results['covers'])
-                table_id =int(results['table_id'])
-                date = results['date']
-                order_id = results['order_id']
-                subtotal = float(results['subtotal'])
-                serviceApplied = results['serviceApplied']
-                discountAmount = float(results['discountAmount'])
                 discountCode = results['discountCode']
                 discountType = results['discountType']
                 discountMessage = results['discountMessage']
-                totalservice = results['totalservice']
-                service = results['service']
                 if str(discountCode) == 'None':
                         if str(discountType) == 'None':
                                 discountCode = ''
                                 discountMessage = ''
                                 discountType = 0
-                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType, discountMessage,service, totalservice) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}','{9}',{10},{11})").format(covers,table_id,subtotal,order_id,date,serviceApplied,discountAmount, discountCode, discountType, discountMessage,service,totalservice))
-        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00, serviceApplied = 0, discountCode = NULL, discountType = 0, discountAmount = 0.00, discountMessage = NULL WHERE table_id = {0};").format(id))
+                cur.execute(("INSERT INTO bill_history(covers, table_id,  total, order_id, date_opened, date_closed, serviceApplied, discountAmount, discountCode, discountType, discountMessage,service, totalservice) VALUES ({0},{1},{2},'{3}','{4}', NOW(),{5},{6},'{7}','{8}','{9}',{10},{11})").format(int(results['covers']),int(results['table_id']),float(results['subtotal']),results['order_id'],results['date'],results['serviceApplied'],float(results['discountAmount']), discountCode, discountType, discountMessage,results['service'],results['totalservice'])) #copies current table info accross to history DB
+        cur.execute(("UPDATE tables SET active = 0, covers = 0, order_id = NULL, total = 0.00, service = 0.00, serviceApplied = 0, totalservice = 0.00, serviceApplied = 0, discountCode = NULL, discountType = 0, discountAmount = 0.00, discountMessage = NULL WHERE table_id = {0};").format(id)) #sets table to default
         mysql.connection.commit()
         cur.close()
         
@@ -504,9 +475,11 @@ def close_table(id):
 
         return redirect(url_for('floor'))
 
+#cover options
 class TableForm(Form):
         covers = SelectField('Covers', choices=[('1','1'),('2','2'),('3','3'),('4','4'),('5','5'),('6','6'),('7','7'),('8','8'),('9','9'),('10','10'),('11','11'),('12','12'),('13','13'),('14','14'),('15','15')])
 
+#discount options
 class DiscountForm(Form):
         discount = SelectField('Apply Discount', choices=[('1','10% off Food'),('2','20% off Food'),('3','30% off Food'),('4','25% off Bill'),('5','50% off Food'),('6','10% off Bill'),('7','20% off Bill'),('8','100% Discount')])     
         discountCode = TextAreaField('Discount Code:')
@@ -533,23 +506,20 @@ class productForm(Form):
 def add_product():
       
         form = productForm(request.form)
-     
         if request.args.get('type'):
                 form.category_id.process_data(request.args.get('type'))
         if request.method == "POST" and form.validate():
                 name = form.name.data
                 description = form.description.data
                 price = form.price.data
-                category_id = form.category_id.data
                 subcategory_id= form.subcategory_id.data
                 stock = form.stock.data
                 cur = mysql.connection.cursor()
-                cur.execute("INSERT INTO product (name, description, subcategory_id) VALUES (%s, %s, %s)",(name,description,subcategory_id))
+                cur.execute("INSERT INTO product (name, description, subcategory_id) VALUES (%s, %s, %s)",(name,description,subcategory_id)) 
                 cur.execute("INSERT INTO product_variation (product_id, price, stock) VALUES (LAST_INSERT_ID(),%s, %s)",(price,stock))
                 mysql.connection.commit()
                 cur.close()
                 flash('Product Created!', 'success')
-
                 return redirect(url_for('stock_management'))
         return render_template('add_product.html', form = form)
 
@@ -561,11 +531,9 @@ def add_product():
 @is_manager
 @is_chef
 def edit_product(product_id):
-
         cur = mysql.connection.cursor()
         form = productForm(request.form)
-           
-        cur.execute("SELECT * FROM product, product_variation, sub_category, category WHERE product.product_id = product_variation.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = category.category_id and product.product_id = %s;", [product_id])
+        cur.execute(("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE product.product_id = {0};").format(product_id)) #selects all infromation about the product that is to be editied 
         product = cur.fetchone()
         form.name.data= product['name']
         form.description.data= product['description']
@@ -573,66 +541,52 @@ def edit_product(product_id):
         form.subcategory_id.process_data(product['subcategory_id'])
         form.category_id.process_data(product['category_id'])
         form.stock.data = product['stock']
-     
+        #updates the product
         if request.method == "POST" and form.validate():
-                name = request.form['name']
-                description = request.form['description']
-                price = request.form['price']
-                category_id = request.form['category_id']
-                subcategory_id = request.form['subcategory_id']
-                stock = request.form['stock']
                 cur = mysql.connection.cursor()
-                cur.execute("UPDATE product SET name=%s, description=%s, subcategory_id=%s WHERE product.product_id = %s", (name, description, subcategory_id, product_id))
-                cur.execute("UPDATE product_variation SET price=%s, stock=%s WHERE product_id = %s", (price,  stock, product_id))
+                cur.execute(("UPDATE product SET name= '{0}', description='{1}', subcategory_id={2} WHERE product.product_id = {3}").format(request.form['name'], request.form['description'], request.form['subcategory_id'], product_id))
+                cur.execute(("UPDATE product_variation SET price={0}, stock={1} WHERE product_id = {2}").format(request.form['price'],  request.form['stock'], product_id))
                 mysql.connection.commit()
-
                 cur.close()
-
                 flash('Product updated!', 'success')
 
                 return redirect(url_for('stock_management'))
         return render_template('_edit_product.html', form = form)
-
 
 #Product delete
 @app.route('/delete_product/<int:id>', methods = ["POST"])
 @is_logged_in
 @is_manager
 @is_chef
-def delete_product(id):
+def delete_product(id): # deletes all information about a product
         cur = mysql.connection.cursor()
-
-        cur.execute("DELETE FROM product  WHERE product_id = %s", [id])
-
-        mysql.connection.commit()
-
-        cur.execute("DELETE FROM product_variation WHERE product_id = %s", [id])
+        cur.execute(("DELETE FROM product  WHERE product_id = {0}").format(id))
+        mysql.connection.commit()                                               
+        cur.execute(("DELETE FROM product_variation WHERE product_id = {0}").format(id)) 
         mysql.connection.commit()
         cur.close()
-        
         flash('Product Deleted!', 'success')
-
         return redirect(url_for('stock_management'))
+
 #drinks
 @app.route('/drinks')
 def drinks():
         
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 1")
+        cur.execute("SELECT * FROM category INNER JOIN sub_category on category.category_id = sub_category.category_id WHERE category.category_id = 1")#selects all sub categories of drinks
         sub_categories = cur.fetchall()
         sub=[]
         for subcat in sub_categories:
-                cur.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id").format((str((subcat["subcategory_id"])))))
+                cur.execute(("SELECT * FROM product INNER JOIN product_variation ON product.product_id = product_variation.product_id WHERE product.subcategory_id = {0}").format((str(subcat["subcategory_id"])))) #loops through each sub category drink
                 sub.append([subcat["subcategory_name"],cur.fetchall()])
         cur.close()
         return render_template('drinks.html',  sub_categories = sub)
-
 
 # starters
 @app.route('/starters')
 def starters():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 2 and category.category_id = 2;")
+        cur.execute("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = 2;") #selects all starters
         starters= cur.fetchall()
         cur.close()
         return render_template('starters.html', starters=starters)
@@ -641,7 +595,7 @@ def starters():
 @app.route('/sides')
 def sides():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 4 and category.category_id = 4;")
+        cur.execute("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = 4") #selects all sides
         sides= cur.fetchall()
         cur.close()
         return render_template('sides.html', sides=sides)
@@ -651,11 +605,11 @@ def sides():
 @app.route('/mains')
 def mains():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM category, sub_category WHERE category.category_id = sub_category.category_id AND category.category_id = 3")
+        cur.execute("SELECT * FROM category INNER JOIN sub_category on category.category_id = sub_category.category_id WHERE category.category_id = 3") #selects all sub categories of mains
         sub_categories = cur.fetchall()
         sub=[]
         for subcat in sub_categories:
-                cur.execute(("SELECT * FROM product, product_variation WHERE product.subcategory_id = {0} AND product.product_id = product_variation.product_id").format((str((subcat["subcategory_id"])))))
+                cur.execute(("SELECT * FROM product INNER JOIN product_variation ON product.product_id = product_variation.product_id WHERE product.subcategory_id = {0}").format((str(subcat["subcategory_id"])))) #loops through each sub category main
                 sub.append([subcat["subcategory_name"],cur.fetchall()])
         cur.close()
         return render_template('mains.html',  sub_categories = sub)
@@ -664,13 +618,12 @@ def mains():
 @app.route('/desserts')
 def desserts():
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = 5  and category.category_id = 5;")
-
+        cur.execute("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = 5") #selects all desserts
         desserts = cur.fetchall()
         cur.close()
-       
         return render_template('desserts.html', desserts=desserts)
 
+#User Edit form
 class EditForm(Form):
         name = StringField('Name', [validators.Length(min=1)])
         username = StringField('Username', [validators.Length(min=4,max=25)])
@@ -686,35 +639,24 @@ class RegisterForm(Form):
         password = PasswordField('Password', [
                 validators.DataRequired(),
                 validators.EqualTo('confirm', message = "Passwords do not match")
-
         ])
         confirm = PasswordField('Confirm Password')
       
-
 #login
 @app.route('/login', methods = ['GET','POST'])
 def login():
         if request.method == 'POST':
                 username = request.form['username']
                 password_candidate = request.form['password']
-                
                 cur = mysql.connection.cursor()
-                result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
-               
+                result = cur.execute(("SELECT * FROM users WHERE username = '{0}'").format(username))
                 if result > 0: #checks if username exists
-                       
                         data = cur.fetchone()
-                        cur.execute("SELECT authority FROM users WHERE username = %s", [username]) 
-                        auth = cur.fetchone() 
-                        cur.execute("SELECT id FROM users WHERE username = %s", [username]) 
-                        userID = cur.fetchone() 
-                        cur.execute("SELECT name FROM users WHERE username = %s", [username]) 
-                        name = cur.fetchone()
-                        name = name['name']                              
+                        auth = data['authority']
+                        userID = data['id']
+                        name = data['name']                        
                         password = data['password']
-                        auth = auth['authority']
-                        userID = userID['id']
-                        if auth == 1:
+                        if auth == 1: #sets auth text for the site for pages that display the authorisation
                                 auth = "General Manager"
                                 session['manager'] = True
                         elif auth == 2:
@@ -725,7 +667,6 @@ def login():
                         elif auth == 4:
                                 auth = "Chef"
                                 session['chef'] = True
-                                print(session['chef'])
                         else:
                                 auth = "Waiter"
                         if sha256_crypt.verify(password_candidate, password): #checks if passwords match
@@ -749,14 +690,13 @@ def login():
                 else: #user doesn't exist
                         error = "Username not found"
                         return render_template('login.html', error = error)
-        
         return render_template('login.html')
 
 #Logout
 @app.route('/logout')
 @is_logged_in
 def logout():
-        session.clear() 
+        session.clear() #logs user out
         flash("You have been logged out!", 'success')
         return redirect(url_for('login'))
 
@@ -767,7 +707,7 @@ def logout():
 def stock_management():
         cur = mysql.connection.cursor()
         for i in range(1,6):
-                cur.execute(("SELECT * FROM product_variation, product, sub_category, category WHERE product_variation.product_id = product.product_id AND product.subcategory_id = sub_category.subcategory_id AND sub_category.category_id = {0} and category.category_id = {0};").format(i))
+                cur.execute(("SELECT * FROM product INNER JOIN product_variation on product.product_id = product_variation.product_id INNER JOIN sub_category on product.subcategory_id = sub_category.subcategory_id INNER JOIN category on sub_category.category_id = category.category_id WHERE category.category_id = {0}").format(i)) #gets every product from the DB
                 if i == 1:
                         drinks = cur.fetchall()
                 elif i == 2:
@@ -786,9 +726,8 @@ def stock_management():
 @is_logged_in
 @is_manager
 def user_management():
-       
         cur = mysql.connection.cursor()
-        cur.execute("SELECT id, name, email, username, authority FROM users ")  
+        cur.execute("SELECT id, name, email, username, authority FROM users")   #gets all users and their corresponding info
         users = cur.fetchall()
         cur.close()
         return render_template('user_management.html',users = users)
@@ -799,11 +738,10 @@ def user_management():
 @is_manager
 def delete_user(id):
         cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM users WHERE id = %s", [id])
+        cur.execute(("DELETE FROM users WHERE id = {0}").format(id)) #deletes user
         mysql.connection.commit()
         cur.close()
         flash('User Deleted!', 'success')
-
         return redirect(url_for('user_management'))
 
 #Add user
@@ -812,7 +750,6 @@ def delete_user(id):
 @is_manager
 def add_user():
         form = RegisterForm(request.form)
-      
         if request.method == 'POST' and form.validate():
                 name = form.name.data
                 email = form.email.data
@@ -820,9 +757,9 @@ def add_user():
                 authority = form.authority.data
                 password = sha256_crypt.encrypt(str(form.password.data)) #encrypts password
                 cur = mysql.connection.cursor()
-                result = cur.execute("SELECT * FROM users WHERE email = %s", [email] )
-                result2 = cur.execute("SELECT * FROM users WHERE username = %s", [username])
-                if result > 0:
+                result = cur.execute(("SELECT * FROM users WHERE email = '{0}'").format(email))
+                result2 = cur.execute(("SELECT * FROM users WHERE username = '{0}'").format(username))
+                if result > 0: # checks if already exists
                         flash("Email already in use. Please try another one!","danger")
                         cur.close()
                 elif result2 > 0:
@@ -830,7 +767,7 @@ def add_user():
                         cur.close()
                 else:
                         cur = mysql.connection.cursor()
-                        cur.execute("INSERT INTO users(name, email, username, authority, password) VALUES(%s, %s, %s,%s, %s)",(name, email, username, authority, password)) #adds all registration information into database
+                        cur.execute(("INSERT INTO users(name, email, username, authority, password) VALUES('{0}','{1}','{2}',{3}, '{4}')").format(name, email, username, authority, password)) #adds all registration information into database
                         mysql.connection.commit()
                         cur.close()
                         flash("User Added!", "success")
@@ -842,38 +779,22 @@ def add_user():
 @is_logged_in
 @is_manager
 def edit_user(id):
-
         cur = mysql.connection.cursor()
-        
-        cur.execute("SELECT * FROM users WHERE id = %s", [id])
-
+        cur.execute(("SELECT * FROM users WHERE id = {0}").format(id)) #gets all current information about the user
         user = cur.fetchone()
-
         form = EditForm(request.form)
-
         form.name.data= user['name']
         form.username.data= user['username']
         form.email.data= user['email']
         form.authority.process_data(user['authority'])
-        
-
         if request.method == "POST":
-                name = request.form['name']
-                username = request.form['username']
-                email = request.form['email']
-                authority = request.form['authority']
-             
                 cur = mysql.connection.cursor()
-                cur.execute("UPDATE users SET name=%s, username=%s, email=%s, authority=%s WHERE  id = %s", (name, username, email,  authority, id))
+                cur.execute(("UPDATE users SET name='{0}', username='{1}', email='{2}', authority={3} WHERE id = {4}").format(request.form['name'], request.form['username'], request.form['email'], request.form['authority'], id)) #Updates users name, usernam, email and authority
                 mysql.connection.commit()
-
                 cur.close()
-
                 flash('User updated!', 'success')    
-
                 return redirect(url_for('user_management'))
         return render_template('_edit_user.html', form = form, user = user)
-
 
 @app.route('/dashboard')
 @is_logged_in

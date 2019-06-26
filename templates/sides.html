@@ -2,28 +2,26 @@
 
 {% block body %}
 <h1>Sides</h1>
-<hr>    
+<hr>
 <table class="table table-striped">
-        
-        <tr><th>Name</th>
-            <th>Price</th>
-            <th>Description</th></tr>
-            {% for side in sides %}
-           <tr>
-                <td>
-                    {{side.name}}   
-                </td>
-                <td>
-                    £{{side.price}}
-                </td>
-                <td>
-                    {{side.description}}
-
-                </td>
-                
-            </tr>
-            
-        {% endfor %}
-    </table>
-    <br>
+    <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Description</th>
+    </tr>
+    {% for side in sides %}
+    <tr>
+        <td>
+            {{side.name}}
+        </td>
+        <td>
+            £{{side.price}}
+        </td>
+        <td>
+            {{side.description}}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
 {% endblock %}

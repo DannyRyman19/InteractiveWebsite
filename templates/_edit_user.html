@@ -1,28 +1,28 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Update User</h1>
-    {% from "includes/_formhelpers.html" import render_field %}
-    <form method="POST" action="">
-        <div class="form-group">
-            {{ render_field(form.name, class_="form-control")}}
-        </div>
-        <div class="form-group">
-            {{ render_field(form.email, class_="form-control")}}
-        </div>
-        <div class="form-group">
-            {{ render_field(form.username, class_="form-control")}}
-        </div>
+<h1>Update User</h1>
+{% from "includes/_formhelpers.html" import render_field %}
+<form method="POST" action="">
+    <div class="form-group">
+        {{ render_field(form.name, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{ render_field(form.email, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{ render_field(form.username, class_="form-control")}}
+    </div>
 
-        {% if user.id != session.id %}
-      
-            <div class="form-group">
-                {{ render_field(form.authority, class_="form-control")}}
-            </div>
+    {% if user.id != session.id %}
 
-        
-        {% endif %}
-        <p><input class="btn btn-primary" type="submit" value="Submit">
-    </form>
+    <div class="form-group">
+        {{ render_field(form.authority, class_="form-control")}}
+    </div>
+
+
+    {% endif %}
+    <p><input class="btn btn-primary" type="submit" value="Submit">
+</form>
 
 {% endblock %}

@@ -6,26 +6,25 @@
 {% for category in sub_categories %}
 <h3>{{category[0]}}</h3>
 <table class="table table-striped">
-        <tr><th>Name</th>
+    <tr>
+        <th>Name</th>
         <th>Price</th>
-        <th>Description</th></tr>
-
+        <th>Description</th>
+    </tr>
     {% for drink in category[1] %}
-            <tr>
-                <td>
-                    {{drink.name}}
-                </td>
-                <td>
-                    £{{drink.price}}
-                </td>
-                <td>
-                    {{drink.description}}
-                </td>
-            </tr>
-    {% endfor %}  
-    </table>
+    <tr>
+        <td>
+            {{drink.name}}
+        </td>
+        <td>
+            £{{drink.price}}
+        </td>
+        <td>
+            {{drink.description}}
+        </td>
+    </tr>
     {% endfor %}
+</table>
+{% endfor %}
 <hr>
-
-
 {% endblock %}

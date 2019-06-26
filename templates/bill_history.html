@@ -1,59 +1,64 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Bill History</h1>
-    <h3><small>Welcome {{session.name}}</small></h3>
-    <hr>
-    <script>
-            $(document).ready( function () {
-          $('#example').DataTable({aaSorting:[[5,'desc']], paging:false});
-      } );
-          </script>
-    <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
-        
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Table Number</th>
-                <th>Bill Total</th>
-                <th>Covers</th>
-                <th>Date Opened</th>
-                <th>Date Closed</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th>Order ID</th>
-                <th>Table Number</th>
-                <th>Bill Total</th>
-                <th>Covers</th>
-                <th>Date Opened</th>
-                <th>Date Closed</th>
-                <th></th>
-            </tr>
-        </tfoot>
-        <tbody>
-          {% for hist in History %}
-            <tr>
-                <td>{{hist.order_id}}</td>
-                <td>{{hist.table_id}}</td>
-                <td>{{hist.total}}</td>
-                <td>{{hist.covers}}</td>
-                <td>{{hist.date_opened}}</td>
-                <td>{{hist.date_closed}}</td>
-                <td><a href ='/bill_history/{{hist.order_id}}' class="btn btn-success">View Full Details</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h1>Bill History</h1>
+<h3><small>Welcome {{session.name}}</small></h3>
+<hr>
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable({
+            aaSorting: [
+                [5, 'desc']
+            ],
+            paging: false
+        });
+    });
+</script>
+<table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
 
-      
-           
-           
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Table Number</th>
+            <th>Bill Total</th>
+            <th>Covers</th>
+            <th>Date Opened</th>
+            <th>Date Closed</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Order ID</th>
+            <th>Table Number</th>
+            <th>Bill Total</th>
+            <th>Covers</th>
+            <th>Date Opened</th>
+            <th>Date Closed</th>
+            <th></th>
+        </tr>
+    </tfoot>
+    <tbody>
+        {% for hist in History %}
+        <tr>
+            <td>{{hist.order_id}}</td>
+            <td>{{hist.table_id}}</td>
+            <td>{{hist.total}}</td>
+            <td>{{hist.covers}}</td>
+            <td>{{hist.date_opened}}</td>
+            <td>{{hist.date_closed}}</td>
+            <td><a href='/bill_history/{{hist.order_id}}' class="btn btn-success">View Full Details</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 
-  
+
+
+
+
+
 
 
 {% endblock %}

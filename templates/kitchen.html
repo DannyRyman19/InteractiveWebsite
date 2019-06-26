@@ -1,46 +1,44 @@
 {% extends 'layout.html' %}
 {% block body %}
-<meta http-equiv="refresh" content="5" >
+<meta http-equiv="refresh" content="5">
 <h1>Open Tables</h1>
 <hr>
-{% if tables == [()] %}
-
-<h1><center>No Open Tables</center></h1>
+{% if tables == [()] or tables == [] %}
+<h1>
+    <center>No Open Tables</center>
+</h1>
 <hr>
 {% else %}
-<div  id="kitchen">
+<div id="kitchen">
     <div class="row-fluid" id="main">
-        
         {% for table in tables %}
         {% if loop.index0 % 3 == 0 %}
         <div class="row">
-        {% endif %}
-            <div  class="col-sm-4">
-                <table class="table table-striped" style="background-color:#E5E5E5" >
+            {% endif %}
+            <div class="col-sm-4">
+                <table class="table table-striped" style="background-color: rgb(117, 117, 117)">
                     <tr>
-                        
                         <h2>Table: {{table[0].table_id}}</h2>
-                            <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Message</th>
-                            {% for n in range(table| length) %}
-                            <tr>
-                                    {% if (table[n].message == "None") or (table[n].message == None)  %}
-                                        <td>{{table[n].name}}</td>
-                                        <td>{{table[n].quantity}}</td>
-                                        <td></td>
-                                    {% else %}
-                                        <td>{{table[n].name}}</td>
-                                        <td>{{table[n].quantity}}</td>
-                                        <td>{{table[n].message}}</td>
-                                    {% endif %}
-                            </tr>                             
-                        {% endfor %}
-                        
+                        <th>Quantity</th>
+                        <th>Item</th>
+                        <th>Message</th>
+                        {% for n in range(table| length) %}
+                    <tr>
+                        {% if (table[n].message == "None") or (table[n].message == None)  %}
+                        <td style="color: rgb(255, 208, 0)">{{table[n].quantity}}</td>
+                        <td style="color: white">{{table[n].name}}</td>
+                        <td></td>
+                        {% else %}
+                        <td style="color: rgb(255,208,0)">{{table[n].quantity}}</td>
+                        <td style="color: white">{{table[n].name}}</td>
+                        <td style="color: white">{{table[n].message}}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
                     </tr>
                 </table>
             </div>
-        {% if loop.index0 % 3 == 2 or loop.last %}
+            {% if loop.index0 % 3 == 2 or loop.last %}
         </div>
         {% endif %}
         <br>

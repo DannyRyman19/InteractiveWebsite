@@ -4,79 +4,87 @@
 <h1>Order Desserts - Table {{table_id}}</h1>
 <hr>
 <div id="Tabledesserts">
-            <div class="row-fluid" id="main">
-                {% for dessert in desserts %}
-                {% if loop.index0 % 3 == 0 %}
-                <div class="row">
+    <div class="row-fluid" id="main">
+        {% for dessert in desserts %}
+        {% if loop.index0 % 3 == 0 %}
+        <div class="row">
+            {% endif %}
+            <div class="col-sm-4">
+                {% if dessert.stock == 0  %}
+                <button type="button" class="btn-lg btn-block btn-danger" data-toggle="modal"
+                    data-target="#orderModal{{dessert.product_id}}" disabled="true">{{dessert.name}}
+                    ({{dessert.stock}})</button>
+                {% elif dessert.stock <= 30 %}
+                <button type="button" class="btn-lg btn-block btn-warning" data-toggle="modal"
+                    data-target="#orderModal{{dessert.product_id}}">{{dessert.name}} ({{dessert.stock}})</button>
+                {% else %}
+                <button type="button" class="btn-lg btn-block btn-success" data-toggle="modal"
+                    data-target="#orderModal{{dessert.product_id}}">{{dessert.name}} ({{dessert.stock}})</button>
                 {% endif %}
-                    <div class="col-sm-4">
-                        {% if dessert.stock == 0  %}
-                            <button type="button" class="btn-lg btn-block btn-danger" data-toggle="modal" data-target="#orderModal{{dessert.product_id}}" disabled="true">{{dessert.name}} ({{dessert.stock}})</button>
-                        {% elif dessert.stock <= 30 %}
-                            <button type="button" class="btn-lg btn-block btn-warning" data-toggle="modal" data-target="#orderModal{{dessert.product_id}}">{{dessert.name}} ({{dessert.stock}})</button>
-                        {% else %}
-                            <button type="button" class="btn-lg btn-block btn-success" data-toggle="modal" data-target="#orderModal{{dessert.product_id}}">{{dessert.name}} ({{dessert.stock}})</button>
-                        {% endif %}
-                    </div>
-                {% if loop.index0 % 3 == 2 or loop.last %}
-                </div>
-                {% endif %}
-                <br>
-                {% endfor %}
             </div>
+            {% if loop.index0 % 3 == 2 or loop.last %}
         </div>
+        {% endif %}
+        <br>
+        {% endfor %}
+    </div>
+</div>
 <hr>
 {% for dessert in desserts %}
 <!-- Modal -->
 <div class="modal fade" id="orderModal{{ dessert.product_id}}" role="dialog">
-        <div class="modal-dialog modal-lg">
-          <!-- Modal content-->
-          <div class="modal-content">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
             <div class="modal-header">
                 <h3>{{dessert.name}}</h3>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
-                    <table id="Tabledessert" class="table">
-                        <th>Price</th>
-                        <th>Message</th>
-                        <th>Stock</th>
-                        <th>Quantity</th>
-                        <th></th>
-                        <th></th>
-                        </tr>
-                            <form id = "Formdessert" action = "/tables/{{table_id}}/add_to_order/{{order_id}}/{{dessert.product_id}}/{{dessert.price}}/" method = "POST">
-                            <td>£{{dessert.price}}</td>
-                            <td><textarea name = "message{{dessert.product_id}}" id="message{{dessert.product_id}}"></textarea></td>
-                            <td>{{dessert.stock}}</td>
-                            <td><input type="button" id ='SubButton{{dessert.product_id}}' value = "-">
-                            <input type="number" min= "0" name="quantity{{dessert.product_id}}" style="width: 50px;" id="quantity{{dessert.product_id}}"  value =1>
-                            <input type="button" id ='AddButton{{dessert.product_id}}' value = "+">
+                <table id="Tabledessert" class="table">
+                    <th>Price</th>
+                    <th>Message</th>
+                    <th>Stock</th>
+                    <th>Quantity</th>
+                    <th></th>
+                    <th></th>
+                    </tr>
+                    <form id="Formdessert"
+                        action="/tables/{{table_id}}/add_to_order/{{order_id}}/{{dessert.product_id}}/{{dessert.price}}/"
+                        method="POST">
+                        <td>£{{dessert.price}}</td>
+                        <td><textarea name="message{{dessert.product_id}}"
+                                id="message{{dessert.product_id}}"></textarea></td>
+                        <td>{{dessert.stock}}</td>
+                        <td><input type="button" id='SubButton{{dessert.product_id}}' value="-">
+                            <input type="number" min="0" name="quantity{{dessert.product_id}}" style="width: 50px;"
+                                id="quantity{{dessert.product_id}}" value=1>
+                            <input type="button" id='AddButton{{dessert.product_id}}' value="+">
                             <script>
-                            $('#SubButton{{dessert.product_id}}').on('click', function () {
-                            var input = $('#quantity{{dessert.product_id}}');
-                            if (parseInt(input.val()) != 0){
-                                input.val(parseInt(input.val()) - 1);
-                                }
-                            })               
+                                $('#SubButton{{dessert.product_id}}').on('click', function () {
+                                    var input = $('#quantity{{dessert.product_id}}');
+                                    if (parseInt(input.val()) != 0) {
+                                        input.val(parseInt(input.val()) - 1);
+                                    }
+                                })
                             </script>
                             <script>
                                 $('#AddButton{{dessert.product_id}}').on('click', function () {
-                                var input = $('#quantity{{dessert.product_id}}');
-                                if (parseInt(input.val()) < '{{dessert.stock}}' ){
-                                    input.val(parseInt(input.val()) + 1);
-                                }
-                            })    
+                                    var input = $('#quantity{{dessert.product_id}}');
+                                    if (parseInt(input.val()) < '{{dessert.stock}}') {
+                                        input.val(parseInt(input.val()) + 1);
+                                    }
+                                })
                             </script>
-                            </td>
-                            <td><input class = "btn btn-success" type = "Submit" value = "Add to Order"></input></td>
-                            <td><button type="" class="btn btn-primary" data-dismiss="modal">Cancel</button></td>
+                        </td>
+                        <td><input class="btn btn-success" type="Submit" value="Add to Order"></input></td>
+                        <td><button type="" class="btn btn-primary" data-dismiss="modal">Cancel</button></td>
                         </tr>
                     </form>
                 </table>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
+</div>
 {% endfor %}
 {% endblock %}

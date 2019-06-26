@@ -1,693 +1,762 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<meta http-equiv="refresh" content="30" >
 <script>
     function editFunction(product_id) {
-          var message = 'message'+product_id;
-          var quantity = 'quantity'+product_id;
-          
-          document.getElementById(message).contentEditable = true;
-          document.getElementById(message).disabled = false;
-          document.getElementById(message).style.color = "blue" ;
+        var message = 'message' + product_id;
+        var quantity = 'quantity' + product_id;
 
-          document.getElementById(quantity).contentEditable = true;
-          document.getElementById(quantity).disabled = false;
-          document.getElementById(quantity).style.color = "blue" ;
-          document.getElementById(product_id+"edit").disabled = true;
-          document.getElementById(product_id+"edit").style.display = "none";  
-          document.getElementById(product_id+"save").style.display = "block";  
+        document.getElementById(message).contentEditable = true;
+        document.getElementById(message).disabled = false;
+        document.getElementById(message).style.color = "blue";
 
+        document.getElementById(quantity).contentEditable = true;
+        document.getElementById(quantity).disabled = false;
+        document.getElementById(quantity).style.color = "blue";
+        document.getElementById(product_id + "edit").disabled = true;
+        document.getElementById(product_id + "edit").style.display = "none";
+        document.getElementById(product_id + "save").style.display = "block";
     }
-        function saveFunction(product_id) {
-              var message = 'message'+product_id;
-              var quantity = 'quantity'+product_id;
+    function saveFunction(product_id) {
+        var message = 'message' + product_id;
+        var quantity = 'quantity' + product_id;
 
-              document.getElementById(message).contentEditable = false;
-              document.getElementById(message).style.color = "black" ;
+        document.getElementById(message).contentEditable = false;
+        document.getElementById(message).style.color = "black";
 
-              document.getElementById(quantity).contentEditable = false;
-              document.getElementById(quantity).style.color = "black" ;
-              document.getElementById(product_id+"edit").disabled = false;              
-              document.getElementById(product_id+"save").style.display = "none"; 
-              document.getElementById(product_id+"edit").style.display = "block"; 
+        document.getElementById(quantity).contentEditable = false;
+        document.getElementById(quantity).style.color = "black";
+        document.getElementById(product_id + "edit").disabled = false;
+        document.getElementById(product_id + "save").style.display = "none";
+        document.getElementById(product_id + "edit").style.display = "block";
+    }
+</script>
+{% if tables.active ==  1 %}
+<h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div>
+</h1>
+<hr>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-7">
+            <a class="btn btn-block btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
+            <a class="btn btn-block btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
+            <a class="btn btn-block btn-success" href="/tables/{{id}}/ordermains">Mains</a>
+            <a class="btn btn-block btn-success" href="/tables/{{id}}/ordersides">Sides</a>
+            <a class="btn btn-block btn-success" href="./{{id}}/orderdesserts">Desserts</a>
+        </div>
+        <div class="col-sm-5">
+            <button type="button" class="btn btn-block btn-secondary" data-toggle="modal"
+                data-target="#tableOptionsModal">Table Options</button>
+            <a class="btn btn-block btn-danger" href="/tables/closetable/{{id}}/">Close Table</a>
+            <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')"
+                value="Print Bill">
+            <br>
+            {% if tables.serviceApplied != 0 or tables.discountType != 0 %}
+            <h3 class="float-right">Total Bill £{{tables.total + tables.discountAmount}}</h3>
+            {% endif %}
+            {% if tables.discountType > 0 %}
+            <h4 class="float-right">Total -{{tables.discountMessage}} Discount: £{{tables.total}}</h4>
+            {% endif %}
+
+        </div>
+    </div>
+    <hr>
+    {% if tables.serviceApplied == 1 %}
+    <h2 class="float-right">Total Bill + 10% Service: £{{tables.totalservice}}</h2>
+    {% else %}
+    <h2 class="float-right">Total Bill £{{tables.total}}</h2>
+    {% endif %}
+    <h4>Bill ID: {{order_id}}</h4>
+    <hr>
+
+    <script>
+        function printDiv(divName) {
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+
+            document.body.innerHTML = originalContents;
         }
     </script>
-    {% if tables.active ==  1 %}
-        <h1>Table Number {{id}}<div class="float-right">Seats:{{tables.covers}}</div></h1>
-        <hr>
-        <div class ="container">
-            <div class="row">
-                <div class="col-sm-7">
-                    <a class="btn btn-block btn-success" href="/tables/{{id}}/orderdrinks">Drinks</a>
-                    <a class="btn btn-block btn-success" href="/tables/{{id}}/orderstarters">Starters</a>
-                    <a class="btn btn-block btn-success" href="/tables/{{id}}/ordermains">Mains</a>
-                    <a class="btn btn-block btn-success" href="/tables/{{id}}/ordersides">Sides</a>
-                    <a class="btn btn-block btn-success" href="./{{id}}/orderdesserts">Desserts</a>
-                </div>
-                <div class="col-sm-5">
-                    <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#tableOptionsModal">Table Options</button>
-                    <a class="btn btn-block btn-danger" href="/tables/closetable/{{id}}/">Close Table</a>
-                    <input type="button" class="btn btn-block btn-primary" onclick="printDiv('printableArea')" value="Print Bill">
 
-
-                    <br>
-                    {% if tables.serviceApplied == 1 %}
-                    <h3 class="float-right">Total Bill £{{tables.total}}</h3>
-                    {% endif %}         
-
-                    {% if tables.discountType > 0 %}
-                        <h4 class="float-right"> {{tables.discountMessage}} Discount: -£{{tables.discountAmount}}</h4>
-                    {% endif %}
-
-                </div>
-            </div>
-            <hr>
-            {% if tables.serviceApplied == 1 %}
-            <h2 class="float-right">Total Bill + 10% Service: £{{tables.totalservice}}</h2>
-            {% else %}
-            <h2 class="float-right">Total Bill £{{tables.total}}</h2>
-            {% endif %}
-            <h4>Bill ID: {{order_id}}</h4>
-
-            
-            <hr>
-
-            <script>
-            function printDiv(divName) {
-                var printContents = document.getElementById(divName).innerHTML;
-                var originalContents = document.body.innerHTML;
-                document.body.innerHTML = printContents;
-                window.print();
-
-                document.body.innerHTML = originalContents;
-                }
-            </script>
-
-            <script>
-                $(document).ready( function () {
-                  $('#all').DataTable();
-              } );
-                    $(document).ready( function () {
-                  $('#drinks').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#starters').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#Mains').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#Sides').DataTable();
-              } );
-              $(document).ready( function () {
-                  $('#Desserts').DataTable();
-              } );
-            </script>
-            <script>
-            $(document).ready(function(){
-            $('table tr td').on('click', function(){
-            $('input[type="text"]',this).css('display','block');
-            });    
+    <script>
+        $(document).ready(function () {
+            $('#all').DataTable();
+        });
+        $(document).ready(function () {
+            $('#drinks').DataTable();
+        });
+        $(document).ready(function () {
+            $('#starters').DataTable();
+        });
+        $(document).ready(function () {
+            $('#Mains').DataTable();
+        });
+        $(document).ready(function () {
+            $('#Sides').DataTable();
+        });
+        $(document).ready(function () {
+            $('#Desserts').DataTable();
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('table tr td').on('click', function () {
+                $('input[type="text"]', this).css('display', 'block');
             });
-            </script>
+        });
+    </script>
     {% else %}
-        <h1>Table Number {{id}}<div class="float-right">Seats:0</div></h1>
-        <hr>    
-        
+    <h1>Table Number {{id}}<div class="float-right">Seats:0</div>
+    </h1>
+    <hr>
+
     {% endif %}
-    <div>
-        
-    </div>
+    
     <div id="printableArea" style="display:none; align-content: center;">
         <table class="table table-striped">
-            
+
             <H1 style="align-content: center">Restaurant Name</H1>
             <h4>Tel: 01234 567890</h4>
-            
-            
-                        <tr>
-                            <th>Quantity</th>
-                            <th>Item</th>
-                            <th>Price</th>
-                            <th>Subtotal</th>
-                        </tr>
-                            {% for drink in drinks %}
-                        
-                        <tr>
-                                <td>{{drink.quantity}}</td>
-                                <td>{{drink.name}}</td>
-                                <td>{{drink.price}}</td>
-                                <td>{{drink.subtotal}}</td>
-                            </tr>
-                            
-                            {% endfor %}
-    
-                            {% for starter in starters %}
-                        
-                        <tr>
-                                <td>{{starter.quantity}}</td>
-                                <td>{{starter.name}}</td>
-                                <td>{{starter.price}}</td>
-                                <td>{{starter.subtotal}}</td>
-                            </tr>
-                            
-                            {% endfor %}
-    
-                            {% for main in mains %}
-                        
-                        <tr>
-                                <td>{{main.quantity}}</td>
-                                <td>{{main.name}}</td>
-                                <td>{{main.price}}</td>
-                                <td>{{main.subtotal}}</td>
-                            </tr>
-                            
-                            {% endfor %}
-    
-                            {% for side in sides %}
-                        
-                        <tr>
-                                <td>{{side.quantity}}</td>                            
-                                <td>{{side.name}}</td>
-                                <td>{{side.price}}</td>
-                                <td>{{side.subtotal}}</td>
-                            </tr>
-                            
-                            {% endfor %}
-    
-                            {% for dessert in desserts %}
-                        
-                            <tr>
-                                <td>{{dessert.quantity}}</td>
-                                <td>{{dessert.name}}</td>
-                                <td>{{dessert.price}}</td>
-                                <td>{{dessert.subtotal}}</td>
-                                {% endfor %}
-                            </tr>   
+
+
+            <tr>
+                <th>Quantity</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+            {% for drink in drinks %}
+
+            <tr>
+                <td>{{drink.quantity}}</td>
+                <td>{{drink.name}}</td>
+                <td>{{drink.price}}</td>
+                <td>{{drink.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for starter in starters %}
+
+            <tr>
+                <td>{{starter.quantity}}</td>
+                <td>{{starter.name}}</td>
+                <td>{{starter.price}}</td>
+                <td>{{starter.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for main in mains %}
+
+            <tr>
+                <td>{{main.quantity}}</td>
+                <td>{{main.name}}</td>
+                <td>{{main.price}}</td>
+                <td>{{main.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for side in sides %}
+
+            <tr>
+                <td>{{side.quantity}}</td>
+                <td>{{side.name}}</td>
+                <td>{{side.price}}</td>
+                <td>{{side.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for dessert in desserts %}
+
+            <tr>
+                <td>{{dessert.quantity}}</td>
+                <td>{{dessert.name}}</td>
+                <td>{{dessert.price}}</td>
+                <td>{{dessert.subtotal}}</td>
+                {% endfor %}
+            </tr>
         </table>
         <br>
-        <br>   
+        <br>
         {% if tables.discountType > 0 %}
-        <h4 class="float-right"> {{tables.discountMessage}} Discount: -£{{tables.discountAmount}}</h4>   
+        <div style="text-align:right">
+            <h4> Subtotal: £{{tables.discountAmount + tables.total}}</h4>
+            <h4> {{tables.discountMessage}} Discount: -£{{tables.discountAmount}}</h4>
+        </div>
         {% endif %}
-        <br>
-        <br>
 
-        {% if tables.serviceApplied == 1 %} 
-            <div style="text-align:right">
-            <h4>Subtotal: £{{tables.total}}</h4>   
-            <h4 >10% Service: £{{tables.service}}</h4>  
-            <h1>Total: £{{tables.totalservice}}</h1>   
-            <p>Bill Number: {{tables.order_id}}</p></div>
-        {% else %}
-            <h1 class="float-right">Total: £{{tables.total}}</h1>   
+        {% if tables.serviceApplied == 1 %}
+        <div style="text-align:right">
+            <h4>Subtotal: £{{tables.total}}</h4>
+            <h4>+ 10% Service: £{{tables.service}}</h4>
+            <br>
+            <br>
+            <h1>Total: £{{tables.totalservice}}</h1>
             <p>Bill Number: {{tables.order_id}}</p>
+        </div>
+        {% else %}
+        <br>
+        <br>
+        <h1 class="float-right">Total: £{{tables.total}}</h1>
+        <p>Bill Number: {{tables.order_id}}</p>
         {% endif %}
     </div>
-   {% if tables.active != 0 %}
+    {% if tables.active != 0 %}
     <h3>All Items</h3>
-    <table id ="all" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
+    <table id="all" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Price</th>
+                <th>Sub Total</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <th>Quantity</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Price</th>
+            <th>Sub Total</th>
 
-                </tfoot>
-                <tbody>
-                        {% for drink in drinks %}
-                    
-                    <tr>
-                            <td><p class="{{drink.product_id}}quantity" >{{drink.quantity}}</p></td>
-                            <td>{{drink.name}}</td>
-                            <td class="{{drink.product_id}}message">{{drink.message}}</td>
-                            <td>{{drink.price}}</td>
-                            <td>{{drink.subtotal}}</td>
+        </tfoot>
+        <tbody>
+            {% for drink in drinks %}
 
-                        </tr>
-                        
-                        {% endfor %}
+            <tr>
+                <td>
+                    <p class="{{drink.product_id}}quantity">{{drink.quantity}}</p>
+                </td>
+                <td>{{drink.name}}</td>
+                <td class="{{drink.product_id}}message">{{drink.message}}</td>
+                <td>{{drink.price}}</td>
+                <td>{{drink.subtotal}}</td>
 
-                        {% for starter in starters %}
-                    
-                    <tr>
-                            <td>{{starter.quantity}}</td>
-                            <td>{{starter.name}}</td>
-                            <td>{{starter.message}}</td>
-                            <td>{{starter.price}}</td>
-                            <td>{{starter.subtotal}}</td>
-                        </tr>
-                        
-                        {% endfor %}
+            </tr>
 
-                        {% for main in mains %}
-                    
-                    <tr>
-                            <td>{{main.quantity}}</td>
-                            <td>{{main.name}}</td>
-                            <td>{{main.message}}</td>
-                            <td>{{main.price}}</td>
-                            <td>{{main.subtotal}}</td>
-                        </tr>
-                        
-                        {% endfor %}
+            {% endfor %}
 
-                        {% for side in sides %}
-                    
-                    <tr>
-                            <td>{{side.quantity}}</td>                            
-                            <td>{{side.name}}</td>
-                            <td>{{side.message}}</td>
-                            <td>{{side.price}}</td>
-                            <td>{{side.subtotal}}</td>
-                        </tr>
-                        
-                        {% endfor %}
+            {% for starter in starters %}
 
-                        {% for dessert in desserts %}
-                    
-                        <tr>
-                            <td>{{dessert.quantity}}</td>
-                            <td>{{dessert.name}}</td>
-                            <td>{{dessert.message}}</td>
-                            <td>{{dessert.price}}</td>
-                            <td>{{dessert.subtotal}}</td>
-                        </tr>
-                            
-                        {% endfor %}
-                    
-                </tbody>   
+            <tr>
+                <td>{{starter.quantity}}</td>
+                <td>{{starter.name}}</td>
+                <td>{{starter.message}}</td>
+                <td>{{starter.price}}</td>
+                <td>{{starter.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for main in mains %}
+
+            <tr>
+                <td>{{main.quantity}}</td>
+                <td>{{main.name}}</td>
+                <td>{{main.message}}</td>
+                <td>{{main.price}}</td>
+                <td>{{main.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for side in sides %}
+
+            <tr>
+                <td>{{side.quantity}}</td>
+                <td>{{side.name}}</td>
+                <td>{{side.message}}</td>
+                <td>{{side.price}}</td>
+                <td>{{side.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+            {% for dessert in desserts %}
+
+            <tr>
+                <td>{{dessert.quantity}}</td>
+                <td>{{dessert.name}}</td>
+                <td>{{dessert.message}}</td>
+                <td>{{dessert.price}}</td>
+                <td>{{dessert.subtotal}}</td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
     </table>
     <hr>
     <h3>Drinks</h3>
-    
-    <table id ="drinks" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                </tfoot>
-                <tbody>
-                        {% for drink in drinks %}
-                    
-                    <tr>
-                            <form id = "Form{{drink.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/" method = "POST">
-                            <td><center><input type="number" id="quantity{{drink.product_id}}" name="quantity{{drink.product_id}}" value="{{drink.quantity}}" style="width:50px; text-align: center" disabled="true"></center></td>
-                            <td>{{drink.name}}</td>
-                            <td><textarea id="message{{drink.product_id}}" name="message{{drink.product_id}}" disabled="true">{{drink.message}}</textarea></textarea></td>
-                            <td>{{drink.price}}</td>
-                            <td>{{drink.subtotal}}</td>
-                            <td><button class="btn btn-block btn-success" id="{{drink.product_id}}edit" onclick="editFunction('{{drink.product_id}}')">Edit</button><button class="btn btn-block btn-primary"style="display: none" id="{{drink.product_id}}save" onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
-                            </form>
-                            <td>
-                                    <form action="{{url_for('remove_order',id=drink.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{drink.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-block btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
-                                    </form>
-                            </td>
-                    </tr>
-                       
-                    
-                        
-                        {% endfor %}
-                    
-                </tbody>   
+
+    <table id="drinks" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Price</th>
+                <th>Sub Total</th>
+                <th>Edit Order</th>
+                <th>Remove from Order</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <th>Quantity</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Price</th>
+            <th>Sub Total</th>
+            <th>Edit Order</th>
+            <th>Remove from Order</th>
+        </tfoot>
+        <tbody>
+            {% for drink in drinks %}
+
+            <tr>
+                <form id="Form{{drink.product_id}}"
+                    action="/tables/{{tables.table_id}}/update_order/{{order_id}}/{{drink.product_id}}/{{drink.price}}/"
+                    method="POST">
+                    <td>
+                        <center><input type="number" id="quantity{{drink.product_id}}"
+                                name="quantity{{drink.product_id}}" value="{{drink.quantity}}"
+                                style="width:50px; text-align: center" disabled="true"></center>
+                    </td>
+                    <td>{{drink.name}}</td>
+                    <td><textarea id="message{{drink.product_id}}" name="message{{drink.product_id}}"
+                            disabled="true">{{drink.message}}</textarea></textarea></td>
+                    <td>{{drink.price}}</td>
+                    <td>{{drink.subtotal}}</td>
+                    <td><button class="btn btn-block btn-success" id="{{drink.product_id}}edit"
+                            onclick="editFunction('{{drink.product_id}}')">Edit</button><button
+                            class="btn btn-block btn-primary" style="display: none" id="{{drink.product_id}}save"
+                            onclick="saveFunction('{{drink.product_id}}')" type="submit">Save</button></td>
+                </form>
+                <td>
+                    <form
+                        action="{{url_for('remove_order',id=drink.product_id, order_id = order_id,table_id = tables.table_id)}}"
+                        method="POST">
+                        <button type="button"
+                            onclick="document.getElementById('deleteForm').action = '/remove_order/{{drink.product_id}}/{{order_id}}/{{tables.table_id}}';"
+                            class="btn btn-block btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
+                    </form>
+                </td>
+            </tr>
+
+
+
+            {% endfor %}
+
+        </tbody>
     </table>
 
     <hr>
     <h3>Starters</h3>
-    <table id = "starters" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
+    <table id="starters" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Price</th>
+                <th>Sub Total</th>
+                <th>Edit Order</th>
+                <th>Remove from Order</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <th>Quantity</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Price</th>
+            <th>Sub Total</th>
+            <th>Edit Order</th>
+            <th>Remove from Order</th>
 
-                </tfoot>
-                <tbody>
-                        {% for starter in starters %}
-                    
-                        <tr>
-                            <form id = "Form{{starter.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{starter.product_id}}/{{starter.price}}/" method = "POST">
-                            <td><input type="number" id="quantity{{starter.product_id}}" name="quantity{{starter.product_id}}" value="{{starter.quantity}}" disabled="true"></td>
-                            <td>{{starter.name}}</td>
-                            <td><textarea id="message{{starter.product_id}}" name="message{{starter.product_id}}" disabled="true">{{starter.message}}</textarea></textarea></td>
-                            <td>{{starter.price}}</td>
-                            <td>{{starter.subtotal}}</td>
-                            <td><button class="btn btn-block btn-success" id="{{starter.product_id}}edit" onclick="editFunction('{{starter.product_id}}')">Edit</button><button class="btn btn-block btn-primary"style="display: none" id="{{starter.product_id}}save" onclick="saveFunction('{{starter.product_id}}')" type="submit">Save</button></td>
-                            </form>
-                            <td>
-                                    <form action="{{url_for('remove_order',id=starter.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{starter.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">x</button>
-                                    </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    
-                </tbody>   
+        </tfoot>
+        <tbody>
+            {% for starter in starters %}
+
+            <tr>
+                <form id="Form{{starter.product_id}}"
+                    action="/tables/{{tables.table_id}}/update_order/{{order_id}}/{{starter.product_id}}/{{starter.price}}/"
+                    method="POST">
+                    <td><input type="number" id="quantity{{starter.product_id}}" name="quantity{{starter.product_id}}"
+                            value="{{starter.quantity}}" disabled="true"></td>
+                    <td>{{starter.name}}</td>
+                    <td><textarea id="message{{starter.product_id}}" name="message{{starter.product_id}}"
+                            disabled="true">{{starter.message}}</textarea></textarea></td>
+                    <td>{{starter.price}}</td>
+                    <td>{{starter.subtotal}}</td>
+                    <td><button class="btn btn-block btn-success" id="{{starter.product_id}}edit"
+                            onclick="editFunction('{{starter.product_id}}')">Edit</button><button
+                            class="btn btn-block btn-primary" style="display: none" id="{{starter.product_id}}save"
+                            onclick="saveFunction('{{starter.product_id}}')" type="submit">Save</button></td>
+                </form>
+                <td>
+                    <form
+                        action="{{url_for('remove_order',id=starter.product_id, order_id = order_id,table_id = tables.table_id)}}"
+                        method="POST">
+                        <button type="button"
+                            onclick="document.getElementById('deleteForm').action = '/remove_order/{{starter.product_id}}/{{order_id}}/{{tables.table_id}}';"
+                            class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">x</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
     </table>
 
     <hr>
     <h3>Mains</h3>
-    <table id = "Mains" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                </tfoot>
-                <tbody>
-                   
-                        {% for main in mains %}
-                        <tr>
-                            <form id = "Form{{main.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{main.product_id}}/{{main.price}}/" method = "POST">
-                            <td><input type="number" id="quantity{{main.product_id}}" name="quantity{{main.product_id}}" value="{{main.quantity}}" disabled="true"></td>
-                            <td>{{main.name}}</td>
-                            <td><textarea id="message{{main.product_id}}" name="message{{main.product_id}}" disabled="true">{{main.message}}</textarea></textarea></td>
-                            <td>{{main.price}}</td>
-                            <td>{{main.subtotal}}</td>
-                            <td><button class="btn btn-success" id="{{main.product_id}}edit" onclick="editFunction('{{main.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{main.product_id}}save" onclick="saveFunction('{{main.product_id}}')" type="submit">Save</button></td>
-                            </form>
-                            <td>
-                                    <form action="{{url_for('remove_order',id=main.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{main.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
-                                    </form>
-                            </td>
-                        </tr>
-                    
-                    {% endfor %}
-                    
-                </tbody>   
-       
-          
+    <table id="Mains" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Price</th>
+                <th>Sub Total</th>
+                <th>Edit Order</th>
+                <th>Remove from Order</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <th>Quantity</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Price</th>
+            <th>Sub Total</th>
+            <th>Edit Order</th>
+            <th>Remove from Order</th>
+        </tfoot>
+        <tbody>
+
+            {% for main in mains %}
+            <tr>
+                <form id="Form{{main.product_id}}"
+                    action="/tables/{{tables.table_id}}/update_order/{{order_id}}/{{main.product_id}}/{{main.price}}/"
+                    method="POST">
+                    <td><input type="number" id="quantity{{main.product_id}}" name="quantity{{main.product_id}}"
+                            value="{{main.quantity}}" disabled="true"></td>
+                    <td>{{main.name}}</td>
+                    <td><textarea id="message{{main.product_id}}" name="message{{main.product_id}}"
+                            disabled="true">{{main.message}}</textarea></textarea></td>
+                    <td>{{main.price}}</td>
+                    <td>{{main.subtotal}}</td>
+                    <td><button class="btn btn-block btn-success" id="{{main.product_id}}edit"
+                            onclick="editFunction('{{main.product_id}}')">Edit</button><button class="btn btn-primary"
+                            style="display: none" id="{{main.product_id}}save"
+                            onclick="saveFunction('{{main.product_id}}')" type="submit">Save</button></td>
+                </form>
+                <td>
+                    <form
+                        action="{{url_for('remove_order',id=main.product_id, order_id = order_id,table_id = tables.table_id)}}"
+                        method="POST">
+                        <button type="button"
+                            onclick="document.getElementById('deleteForm').action = '/remove_order/{{main.product_id}}/{{order_id}}/{{tables.table_id}}';"
+                            class="btn btn-danger btn-block " data-toggle="modal" data-target="#deleteModal">x</button>
+                    </form>
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+
     </table>
 
     <hr>
     <h3>Sides</h3>
-    <table id ="Sides" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                </tfoot>
-                <tbody>
-                   
-                        {% for side in sides %}
-                        <tr>
-                            <form id = "Form{{side.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{side.product_id}}/{{side.price}}/" method = "POST">
-                            <td><input type="number" id="quantity{{side.product_id}}" name="quantity{{side.product_id}}" value="{{side.quantity}}" disabled="true"></td>
-                            <td>{{side.name}}</td>
-                            <td><textarea id="message{{side.product_id}}" name="message{{side.product_id}}" disabled="true">{{side.message}}</textarea></textarea></td>
-                            <td>{{side.price}}</td>
-                            <td>{{side.subtotal}}</td>
-                            <td><button class="btn btn-success" id="{{side.product_id}}edit" onclick="editFunction('{{side.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{side.product_id}}save" onclick="saveFunction('{{side.product_id}}')" type="submit">Save</button></td>
-                            </form>
-                            <td>
-                                    <form action="{{url_for('remove_order',id=side.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{side.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
-                                    </form>
-                            </td>
-                        </tr>
-                    
-                    {% endfor %}
-                    
-                </tbody>   
-       
+    <table id="Sides" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Price</th>
+                <th>Sub Total</th>
+                <th>Edit Order</th>
+                <th>Remove from Order</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <th>Quantity</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Price</th>
+            <th>Sub Total</th>
+            <th>Edit Order</th>
+            <th>Remove from Order</th>
+        </tfoot>
+        <tbody>
+
+            {% for side in sides %}
+            <tr>
+                <form id="Form{{side.product_id}}"
+                    action="/tables/{{tables.table_id}}/update_order/{{order_id}}/{{side.product_id}}/{{side.price}}/"
+                    method="POST">
+                    <td><input type="number" id="quantity{{side.product_id}}" name="quantity{{side.product_id}}"
+                            value="{{side.quantity}}" disabled="true"></td>
+                    <td>{{side.name}}</td>
+                    <td><textarea id="message{{side.product_id}}" name="message{{side.product_id}}"
+                            disabled="true">{{side.message}}</textarea></textarea></td>
+                    <td>{{side.price}}</td>
+                    <td>{{side.subtotal}}</td>
+                    <td><button class="btn btn-success" id="{{side.product_id}}edit"
+                            onclick="editFunction('{{side.product_id}}')">Edit</button><button class="btn btn-primary"
+                            style="display: none" id="{{side.product_id}}save"
+                            onclick="saveFunction('{{side.product_id}}')" type="submit">Save</button></td>
+                </form>
+                <td>
+                    <form
+                        action="{{url_for('remove_order',id=side.product_id, order_id = order_id,table_id = tables.table_id)}}"
+                        method="POST">
+                        <button type="button"
+                            onclick="document.getElementById('deleteForm').action = '/remove_order/{{side.product_id}}/{{order_id}}/{{tables.table_id}}';"
+                            class="btn btn-danger btn-block " data-toggle="modal" data-target="#deleteModal">x</button>
+                    </form>
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
     </table>
 
     <hr>
     <h3>Desserts</h3>
-    <table id="Desserts"class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                        <th>Quantity</th>
-                        <th>Name</th>
-                        <th>Message</th>
-                        <th>Price</th>
-                        <th>Sub Total</th>
-                        <th>Edit Order</th>
-                        <th>Remove from Order</th>
-                </tfoot>
-                <tbody>
-                   
-                        {% for dessert in desserts %}
-                        <tr>
-                            <form id = "Form{{dessert.product_id}}" action = "/tables/{{tables.table_id}}/update_order/{{order_id}}/{{dessert.product_id}}/{{dessert.price}}/" method = "POST">
-                            <td><input type="number" id="quantity{{dessert.product_id}}" name="quantity{{dessert.product_id}}" value="{{dessert.quantity}}" disabled="true"></td>
-                            <td>{{dessert.name}}</td>
-                            <td><textarea id="message{{dessert.product_id}}" name="message{{dessert.product_id}}" disabled="true">{{dessert.message}}</textarea></textarea></td>
-                            <td>{{dessert.price}}</td>
-                            <td>{{dessert.subtotal}}</td>
-                            <td><button class="btn btn-success" id="{{dessert.product_id}}edit" onclick="editFunction('{{dessert.product_id}}')">Edit</button><button class="btn btn-primary"style="display: none" id="{{dessert.product_id}}save" onclick="saveFunction('{{dessert.product_id}}')" type="submit">Save</button></td>
-                            </form>
-                            <td>
-                                    <form action="{{url_for('remove_order',id=dessert.product_id, order_id = order_id,table_id = tables.table_id)}}" method="POST">
-                                            <button type="button" onclick="document.getElementById('deleteForm').action = '/remove_order/{{dessert.product_id}}/{{order_id}}/{{tables.table_id}}';" class="btn btn-danger " data-toggle="modal" data-target="#deleteModal">x</button>
-                                    </form>
-                            </td>
-                        </tr>
-                    
-                    {% endfor %}
-                    
-                </tbody>   
+    <table id="Desserts" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Price</th>
+                <th>Sub Total</th>
+                <th>Edit Order</th>
+                <th>Remove from Order</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <th>Quantity</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Price</th>
+            <th>Sub Total</th>
+            <th>Edit Order</th>
+            <th>Remove from Order</th>
+        </tfoot>
+        <tbody>
+
+            {% for dessert in desserts %}
+            <tr>
+                <form id="Form{{dessert.product_id}}"
+                    action="/tables/{{tables.table_id}}/update_order/{{order_id}}/{{dessert.product_id}}/{{dessert.price}}/"
+                    method="POST">
+                    <td><input type="number" id="quantity{{dessert.product_id}}" name="quantity{{dessert.product_id}}"
+                            value="{{dessert.quantity}}" disabled="true"></td>
+                    <td>{{dessert.name}}</td>
+                    <td><textarea id="message{{dessert.product_id}}" name="message{{dessert.product_id}}"
+                            disabled="true">{{dessert.message}}</textarea></textarea></td>
+                    <td>{{dessert.price}}</td>
+                    <td>{{dessert.subtotal}}</td>
+                    <td><button class="btn btn-success" id="{{dessert.product_id}}edit"
+                            onclick="editFunction('{{dessert.product_id}}')">Edit</button><button
+                            class="btn btn-primary" style="display: none" id="{{dessert.product_id}}save"
+                            onclick="saveFunction('{{dessert.product_id}}')" type="submit">Save</button></td>
+                </form>
+                <td>
+                    <form
+                        action="{{url_for('remove_order',id=dessert.product_id, order_id = order_id,table_id = tables.table_id)}}"
+                        method="POST">
+                        <button type="button"
+                            onclick="document.getElementById('deleteForm').action = '/remove_order/{{dessert.product_id}}/{{order_id}}/{{tables.table_id}}';"
+                            class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">x</button>
+                    </form>
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
     </table>
     {% else %}
-    <center><a class="btn btn-primary btn-block" style="height:120px;" href="/tables/opentable/{{id}}/"><br><h1>Open Table</h1></a></center>
+    <center><a class="btn btn-primary btn-block" style="height:120px;" href="/tables/opentable/{{id}}/"><br>
+            <h1>Open Table</h1>
+        </a></center>
     <hr>
 
     {% endif %}
 
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" role="dialog">
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" role="dialog">
         <div class="modal-dialog">
-        
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-                <h3>Remove from table</h3>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-              <p>Are you sure you want to remove this product from the table?</p>
-            </div>
-            <div class="modal-footer">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Remove from table</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this product from the table?</p>
+                </div>
+                <div class="modal-footer">
                     <form id="deleteForm" action="" method="POST">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <input type="submit" value="Delete" class="btn btn-danger">
-                            <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="submit" value="Delete" class="btn btn-danger">
+                        <button type="" class="btn btn-primary" data-dismiss="modal">Cancel </button>
                     </form>
+                </div>
             </div>
-          </div>
-          
-        </div>
-      </div>
-      
-<!-- Tabe Options Modal -->
-<div class="modal fade" id="tableOptionsModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-            <h3>Table Options</h3>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="container">
-              <div class="row">
-                  <div class="col-sm-4">
-                    <form action="{{url_for('covers',id=tables.table_id)}}" method="POST">
-                        <a href="#coversModal" class="btn btn-secondary btn-block" data-toggle="modal" data-dismiss="modal">Edit Covers</a>
-                    </form>
-                  </div>
-                  <div class="col-sm-4">
-                    <a href="#discountModal" class="btn btn-primary btn-block" data-toggle="modal" data-dismiss="modal">Discount</a>
-                  </div>
-                    <div class="col-sm-4">
-                      {% if tables.serviceApplied == 0 %}
-                        <form action="{{url_for('service', service = 1, id=tables.table_id)}}" method="POST">
-                            <button action="/tables/service/{{tables.table_id}}/1"class="btn btn-primary btn-success btn-block">Add Service Charge</button> 
-                        </form> 
-                      {% else %}            
-                        <form action="{{url_for('service', service = 0, id=tables.table_id)}}" method="POST">
-                            <button action="/tables/service/{{tables.table_id}}/0"class="btn btn-primary btn-danger btn-block">Remove Service Charge</button> 
-                        </form> 
-                      {% endif %}
-                  </div>
-              </div>
-          </div>
-        </div>
-        <div class="modal-footer">
 
         </div>
-      </div>
-      
     </div>
-  </div>
 
-<!-- Edit Covers Modal -->
-<div class="modal fade"id="coversModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-    
-        <!-- Modal content-->
-        <div class="modal-content">
-        <div class="modal-header">
-            <h3>Table Options - Edit Covers</h3>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <!-- Tabe Options Modal -->
+    <div class="modal fade" id="tableOptionsModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Table Options</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <form action="{{url_for('covers',id=tables.table_id)}}" method="POST">
+                                    <a href="#coversModal" class="btn btn-secondary btn-block" data-toggle="modal"
+                                        data-dismiss="modal">Edit Covers</a>
+                                </form>
+                            </div>
+                            <div class="col-sm-4">
+                                <a href="#discountModal" class="btn btn-primary btn-block" data-toggle="modal"
+                                    data-dismiss="modal">Discount</a>
+                            </div>
+                            <div class="col-sm-4">
+                                {% if tables.serviceApplied == 0 %}
+                                <form action="{{url_for('service', service = 1, id=tables.table_id)}}" method="POST">
+                                    <button action="/tables/service/{{tables.table_id}}/1"
+                                        class="btn btn-primary btn-success btn-block">Add Service Charge</button>
+                                </form>
+                                {% else %}
+                                <form action="{{url_for('service', service = 0, id=tables.table_id)}}" method="POST">
+                                    <button action="/tables/service/{{tables.table_id}}/0"
+                                        class="btn btn-primary btn-danger btn-block">Remove Service Charge</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
 
         </div>
+    </div>
 
-        <div class="modal-body">
-                {% from "includes/_formhelpers.html" import render_field %}
-                <form method="POST" action="{{url_for('covers', id = tables.table_id)}}">
-                    <div class="form-group">
-                     {{ render_field(form.covers, class_="form-control")}}
-                    </div>
-                <input class="btn btn-success btn-block" type="submit" value="Update">
-                </form>
-        </div>
+    <!-- Edit Covers Modal -->
+    <div class="modal fade" id="coversModal" role="dialog">
+        <div class="modal-dialog modal-lg">
 
-        <div class="modal-footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <a href="#tableOptionsModal" class="btn btn-primary btn-block" data-toggle="modal" data-dismiss="modal">Back</a>
-                    </div>
-                    <div class="col-sm-6">
-                        <button class="btn btn-danger btn-block " data-dismiss="modal">Cancel</button>   
-                           
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Table Options - Edit Covers</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                </div>
+
+                <div class="modal-body">
+                    {% from "includes/_formhelpers.html" import render_field %}
+                    <form method="POST" action="{{url_for('covers', id = tables.table_id)}}">
+                        <div class="form-group">
+                            {{ render_field(form.covers, class_="form-control")}}
+                        </div>
+                        <input class="btn btn-success btn-block" type="submit" value="Update">
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <a href="#tableOptionsModal" class="btn btn-primary btn-block" data-toggle="modal"
+                                    data-dismiss="modal">Back</a>
+                            </div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-danger btn-block " data-dismiss="modal">Cancel</button>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        </div>
-        
-    </div>
-</div>
 
-<!-- Discount Modal -->
-<div class="modal fade"id="discountModal" role="dialog">
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div class="modal fade" id="discountModal" role="dialog">
         <div class="modal-dialog modal-lg">
-        
+
             <!-- Modal content-->
             <div class="modal-content">
-            <div class="modal-header">
-                <h3>Table Options - Discount</h3>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-    
-            </div>
-            <div class="modal-body">  
-                {% if tables.discountType == 0 %}   
+                <div class="modal-header">
+                    <h3>Table Options - Discount</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                </div>
+                <div class="modal-body">
+                    {% if tables.discountType == 0 %}
                     {% from "includes/_formhelpers.html" import render_field %}
                     <form method="POST" action="{{url_for('discount', id = tables.table_id)}}">
                         <div class="form-group">
                             {{ render_field(discountForm.discountCode, class_="form-control")}}
                         </div>
-                    <center>
-                        <input class="btn btn-success btn-block" type="submit" value="Apply Discount">
-                    </center>   
+                        <center>
+                            <input class="btn btn-success btn-block" type="submit" value="Apply Discount">
+                        </center>
                     </form>
-                {% else %}
-                <center>
-                    <h3>Current Discount Applied: {{tables.discountMessage}}</h3>
-                    <form method="POST" action="{{url_for('removediscount', id = tables.table_id)}}">
-                        <input class="btn btn-danger btn-block" type="submit" value="Remove Discount">
-                </center>
-                {% endif %}
-            </div>
-            <div class="modal-footer">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <a href="#tableOptionsModal" class="btn btn-primary btn-block" data-toggle="modal" data-dismiss="modal">Back</a>
-                        </div>
-                        <div class="col-sm-6">
-                            <button class="btn btn-danger btn-block" data-dismiss="modal">Cancel</button>   
-                               
+                    {% else %}
+                    <center>
+                        <h3>Current Discount Applied: {{tables.discountMessage}}</h3>
+                        <form method="POST" action="{{url_for('removediscount', id = tables.table_id)}}">
+                            <input class="btn btn-danger btn-block" type="submit" value="Remove Discount">
+                    </center>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <a href="#tableOptionsModal" class="btn btn-primary btn-block" data-toggle="modal"
+                                    data-dismiss="modal">Back</a>
+                            </div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-danger btn-block" data-dismiss="modal">Cancel</button>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
-            
+
         </div>
     </div>
-{% endblock %}
+    {% endblock %}

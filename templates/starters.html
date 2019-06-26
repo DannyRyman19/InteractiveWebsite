@@ -2,28 +2,26 @@
 
 {% block body %}
 <h1>Starters</h1>
-<hr>    
+<hr>
 <table class="table table-striped">
-        <tr><th>Name</th>
-            <th>Price</th>
-            <th>Description</th></tr>
-           <tr>
+    <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Description</th>
+    </tr>
+    <tr>
         {% for starter in starters %}
-
-                <td>
-                    {{starter.name}}   
-                </td>
-                <td>
-                    £{{starter.price}}
-                </td>
-                <td>
-                    {{starter.description}}
-
-                </td>
-                
-            </tr>
-            
-        {% endfor %}
-    </table>
-    <br>
+        <td>
+            {{starter.name}}
+        </td>
+        <td>
+            £{{starter.price}}
+        </td>
+        <td>
+            {{starter.description}}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
 {% endblock %}

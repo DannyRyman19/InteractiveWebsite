@@ -1,45 +1,46 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta name = "viewport" content="=width=device-width, initial-scale=1.0">
-    
+    <meta name="viewport" content="=width=device-width, initial-scale=1.0">
+
     <title>Restaurant
     </title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.js" integrity="sha256-pl1bSrtlqtN/MCyW8XUTYuJCKohp9/iJESVW1344SBM=" crossorigin="anonymous"></script>
-    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.js"
+        integrity="sha256-pl1bSrtlqtN/MCyW8XUTYuJCKohp9/iJESVW1344SBM=" crossorigin="anonymous"></script>
+    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <style>
         #cont {
-            min-height:100%;
-            margin-bottom: -50px; /* Put negative height of the footer here */
-            padding-bottom: 50px; /* Put height of the footer here. Needed for higher than screen height pages */
+            min-height: 100%;
+            margin-bottom: -50px;
+            /* Put negative height of the footer here */
+            padding-bottom: 50px;
+            /* Put height of the footer here. Needed for higher than screen height pages */
         }
     </style>
     <link rel="stylesheet" href="http://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
+
 <body>
-      
+
 
     {% include 'includes/_navbar.html' %}
     {% include 'includes/_messages.html' %}
 
     <div class="container" id="cont">
 
-   
-    {% block body%}
 
- 
-    
+        {% block body%}
+        {% block footer %} {% endblock %}
+        {% endblock %}
 
-    {% block footer %} {% endblock %}
-    {% endblock %}
-    
-    </script>
+        </script>
 </body>
 
 <footer>
-        {% include 'includes/_footer.html' %}
+    {% include 'includes/_footer.html' %}
 </footer>
 
 </html>
